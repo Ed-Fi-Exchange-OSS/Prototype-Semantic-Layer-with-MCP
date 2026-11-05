@@ -1,9 +1,8 @@
-# ADR 0001: Architecture of the early warning semantic layer and MCP server
+# ADR 0001: Phase 1 architecture of the early warning MCP server
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-05
 - **Requirements:** [PRD](../PRD.md)
-- **Jira:** DEVOPS-181, DEVOPS-182, DEVOPS-183
 
 ## Context
 
@@ -11,8 +10,10 @@ The [PRD](../PRD.md) asks for an MCP server that lets an AI application answer
 early warning questions for the signed-in educator, only about the students
 that educator may see, without giving the AI application SQL or Ed-Fi API
 access. This ADR records how the proof of concept implements the semantic layer
-and the MCP server for the first phases (DEVOPS-181 to DEVOPS-183), and what it
-leaves ready for sign-in and lineage (DEVOPS-184 to DEVOPS-187).
+and the MCP server for the first phases of the PRD's phased delivery (the
+semantic layer, the design and the tools for a demo user), and what it leaves
+ready for sign-in and lineage. Those later phases will have their own
+decisions, for example how lineage sidecar tables are populated and read.
 
 ## Decision
 
@@ -35,9 +36,14 @@ leaves ready for sign-in and lineage (DEVOPS-184 to DEVOPS-187).
 - **Language:** TypeScript on Node.js 22, with the official MCP SDK
   (`@modelcontextprotocol/sdk`) and `pg`. Stephen Fuqua had no preference; this
   matches the Alliance's earlier MCP work.
-- **Transport:** Streamable HTTP, stateless (a new server and transport per
-  request), because OAuth in MCP applies to the HTTP transport. Stdio is also
-  available for local use.
+- **Transport:** Streamable HTTP over HTTPS, stateless (a new server and
+  transport per request), because OAuth in MCP applies to the HTTP transport
+  and tokens shouldn't travel in clear text. For the local demonstration, the
+  Docker setup creates a self-signed certificate for `localhost`, and MCP
+  clients must trust it (Node.js-based clients such as Claude Code and the
+  GitHub Copilot CLI through `NODE_EXTRA_CA_CERTS`). Without a certificate the
+  server falls back to plain HTTP, for development. Stdio is also available for
+  local use.
 - **Six fixed tools.** Each tool runs one SQL file with bind parameters only.
   Parameters are validated with a schema (types, ranges, lengths) before any
   query runs. No tool takes SQL, a table, a column or a user.
@@ -56,14 +62,14 @@ leaves ready for sign-in and lineage (DEVOPS-184 to DEVOPS-187).
   (`rls_userstudentdataauthorization`) on that user. A student outside the
   mapping simply isn't in the result.
 - **User before sign-in.** A `DEMO_USER_EMAIL` setting names the user until
-  OAuth (DEVOPS-184). Resolving the user is one function, so sign-in replaces
+  OAuth. Resolving the user is one function, so sign-in replaces
   it without changing the tools.
 - **Read-only access.** The server connects as `mcp_reader`, a role that can
   only read the `analytics` schema of the data mart and has no access to the
   ODS; its sessions are also read-only.
 - **Compact, traceable results.** Results are JSON with the fields a person
   would read, row caps (default 25, maximum 100) with a `truncated` flag, the
-  as-of date and the data mart tables used. Lineage (DEVOPS-187) can add source
+  as-of date and the data mart tables used. Lineage can add source
   references to the same shape.
 - **Deployment:** a container defined next to the data mart in the same
   Docker Compose file (profile `mcp`).
@@ -90,7 +96,7 @@ it needs the user in the database session (a role per user or a session
 setting) and policies on every table. Joining the access mapping in each query
 is simpler for a few fixed queries, and the tests check it for every tool.
 Chosen: the queries, with a read-only role. Row-level security stays an option
-when sign-in brings real users (DEVOPS-184, DEVOPS-185).
+when sign-in brings real users.
 
 ### Views over the ODS or a materialized data mart
 
@@ -99,6 +105,14 @@ views' joins over the operational tables, and the server would need access to
 the ODS. A materialized data mart is fast, isolates the server from the ODS,
 and is where lineage tables can live. Chosen: the materialized data mart,
 refreshed on demand.
+
+### HTTPS with a self-signed certificate, or plain HTTP
+
+Plain HTTP is simpler for a local demonstration, but sign-in will put access
+tokens on the wire, and clients and reviewers expect HTTPS. A self-signed
+certificate costs one step at setup and one setting per client. Chosen: HTTPS
+with a self-signed certificate; a real deployment would use a trusted
+certificate.
 
 ### Stateful or stateless HTTP sessions
 
