@@ -1,0 +1,18 @@
+{
+ "assistant": "claude",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 13.9,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__list_students_at_risk",
+   "arguments": {
+    "limit": 10
+   }
+  }
+ ],
+ "answer": "Here are your top 5. I ranked the first three by the tool's order and the last two by my own judgment of severity.\n\n| # | Student | Attendance | Failing grades | Other flags |\n|---|---|---|---|---|\n| 1 | **Clark Vernon** (10th, key 004688) | 43 of 49 days absent (87.8%) | 8 | Low assessment result, 1 discipline action. All 4 indicators are flagged. |\n| 2 | **Cathleen Coates** (10th, key 004761) | 37 of 49 days absent (75.5%) | 7 | Low assessment result |\n| 3 | **Erika Sadler** (10th, key 004488) | 31 of 49 days absent (63.3%) | 8 | Low assessment result |\n| 4 | **Digna Alejos** (10th, key 004620) | 2 days absent (4.1%) | 8 | Low assessment result, 1 discipline action |\n| 5 | **Vernon Henderson** (10th, key 004729) | 5 days absent (10.2%) | 8 | Low assessment result |\n\n**Why they're on the list**\n- **Clark, Cathleen and Erika:** They are largely not attending, and they are failing nearly every course on top of it. Clark is the most urgent because he also has a discipline action.\n- **Digna:** She is nearly always present but failing 8 courses and has a discipline action. That points to a problem with engagement, behavior or learning, not attendance. Calling home won't fix it the way it might for the first three.\n- **Vernon Henderson:** He is failing 8 courses, and his attendance sits right at the 10% threshold.\n\n**Next in line:** Alfred Rapp (6 failing, 1 discipline action) and Jason Day (16.3% absent, 4 failing) just missed the cut. Alfred Rapp could reasonably replace Vernon Henderson.\n\n**Caveats**\n- The data runs through the Second Six Weeks, as of 2026-11-05, and covers 49 instructional days.\n- The tool's list was cut off at 10 rows, so I only saw the top 10 by indicator count. Anyone below that wasn't considered.\n- Failing grades are counted per course, so \"8\" means 8 courses, not 8 assignments.\n\nI can pull the six-week attendance trend or the full summary for any of these students. The trend would show whether a student's absences are getting worse or leveling off."
+}

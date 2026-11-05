@@ -1,0 +1,31 @@
+{
+ "assistant": "claude",
+ "id": "P2",
+ "kind": "normal",
+ "prompt": "How is Clark Vernon doing this year?",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 12.2,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "student": "004688",
+    "weeks": 12
+   }
+  }
+ ],
+ "answer": "Clark Vernon (10th grade, Ridgemont High School, student key 004688) is doing very poorly this year. Data is as of 2026-11-05.\n\n**Attendance**\n- He has been absent 43 of 49 instructional days, an absence rate of 87.8%.\n- 42 of those absences are unexcused and 1 is excused. He has no tardies.\n- He has missed 60–100% of every week since school started on 2026-08-24, and he missed 100% of the week of 11/2. There is no sign of improvement.\n\n**Grades (Second Six Weeks)**\nHe is failing all 8 courses, with scores between 35 and 49:\n\n| Course | Score |\n|---|---|\n| Humanities | 35 |\n| Physical Education | 42 |\n| Languages Other Than English I | 43 |\n| Biology | 44 |\n| English II | 44 |\n| Computer Lab | 46 |\n| World History Studies | 46 |\n| Intermediate Art | 49 |\n\n**Assessment**\n- He scored 8 on the STATE Algebra II assessment on 2026-09-02, which is Well Below Basic.\n\n**Discipline**\n- He received one in-school suspension, on 2026-08-25.\n- No program enrollments are on record.\n\n**Takeaway**\nThe failing grades follow from the absences. He needs urgent, coordinated attention. The first step is to find out why he isn't attending, for example by contacting the family or the counselor. After that, the school can look at a truancy or attendance intervention and a credit-recovery plan."
+}
