@@ -9,6 +9,9 @@ educator, and only about the students that educator may see. The design is in
 This first version has no sign-in: a demo user, set with `DEMO_USER_EMAIL`,
 stands in for the signed-in educator.
 
+What was tested and the results, including runs with Claude Code and GitHub
+Copilot, are in [TESTING.md](./TESTING.md).
+
 ## Tools
 
 | Tool | What it answers |
