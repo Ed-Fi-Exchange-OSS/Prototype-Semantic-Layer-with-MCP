@@ -1,11 +1,9 @@
 # Early warning data mart
 
 A small PostgreSQL data mart for the early warning use case, built from the
-Ed-Fi Northridge sample data with the [Analytics Middle
-Tier](https://github.com/Ed-Fi-Exchange-OSS/Ed-Fi-Analytics-Middle-Tier) (AMT).
-It's the semantic layer the MCP server reads: Ed-Fi data reshaped into
-dimensions and facts about attendance, assessments and grades, plus the
-user-to-student mappings that row-level security needs.
+Ed-Fi Northridge sample data. It's the semantic layer the MCP server reads:
+Ed-Fi data reshaped into dimensions and facts about attendance, assessments and
+grades, plus the user-to-student mappings that row-level security needs.
 
 ## Requirements
 
@@ -27,12 +25,12 @@ container (`docker-compose.yml`, port 5440 by default):
    21,600 students in 13 schools) and restores it as `EdFi_Ods_Northridge`.
 2. **Current school year:** Northridge holds the 2017-2018 school year.
    `sql/time-travel.sql` moves every date to the current school year, keeping
-   weekdays, so the AMT views that look for current enrollments return data.
-3. **Analytics Middle Tier:** installs the AMT views for Data Standard 5
-   (`sql/amt`) on the ODS, and maps Northridge's staff email type so each staff
-   member becomes a user (`sql/amt-descriptor-map.sql`).
-4. **Data mart:** `sql/amt-datamart.sql` copies every AMT view into a table in
-   the `edfi_datamart` database, schema `analytics`, and indexes them.
+   weekdays, so the views that look for current enrollments return data.
+3. **Analytics views:** installs the views (`sql/views`) on the ODS, and maps
+   Northridge's staff email type so each staff member becomes a user
+   (`sql/descriptor-map.sql`).
+4. **Data mart:** `sql/datamart.sql` copies every view into a table in the
+   `edfi_datamart` database, schema `analytics`, and indexes them.
 
 To rebuild only the data mart from the ODS, run
 `./build-datamart.ps1 -RefreshOnly`.

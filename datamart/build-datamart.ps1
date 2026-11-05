@@ -11,9 +11,9 @@
     Runs everything in the PostgreSQL container from docker-compose.yml:
     1. Downloads the Northridge sample ODS (ODS/API 7.3, Data Standard 5.2) and restores it.
     2. Moves its dates to the current school year (sql/time-travel.sql).
-    3. Installs the Analytics Middle Tier views (sql/amt) and their Northridge configuration
-       (sql/amt-descriptor-map.sql).
-    4. Builds the data mart database, with the views materialized into tables (sql/amt-datamart.sql).
+    3. Installs the analytics views (sql/views) and their Northridge configuration
+       (sql/descriptor-map.sql).
+    4. Builds the data mart database, with the views materialized into tables (sql/datamart.sql).
 
 .PARAMETER RefreshOnly
     Only rebuilds the data mart from the ODS (step 4).
@@ -30,7 +30,7 @@ $DataMartDb = 'edfi_datamart'
 $NorthridgeFile = 'EdFi_Ods_Northridge_v73_20241230_PG13.7z'
 # Same file as Ed-Fi-ODS-Implementation's DatabaseTemplate/Scripts/NorthridgePostgreSql.ps1
 $NorthridgeUrl = "https://odsassets.blob.core.windows.net/public/Northridge/$NorthridgeFile"
-$AmtCollections = 'Base', 'Asmt', 'Ews', 'Chrab', 'RLS'
+$ViewFolders = 'Base', 'Asmt', 'Ews', 'Chrab', 'RLS'
 
 function Invoke-Db {
     param([string] $Command)
@@ -67,13 +67,13 @@ if (-not $RefreshOnly) {
     Write-Host 'Moving the dates to the current school year...'
     Invoke-SqlFile $OdsDb 'time-travel.sql'
 
-    Write-Host 'Installing the Analytics Middle Tier...'
-    foreach ($collection in $AmtCollections) {
-        Get-ChildItem "sql/amt/$collection/*.sql" | Sort-Object Name | ForEach-Object {
-            Invoke-SqlFile $OdsDb "amt/$collection/$($_.Name)"
+    Write-Host 'Installing the analytics views...'
+    foreach ($folder in $ViewFolders) {
+        Get-ChildItem "sql/views/$folder/*.sql" | Sort-Object Name | ForEach-Object {
+            Invoke-SqlFile $OdsDb "views/$folder/$($_.Name)"
         }
     }
-    Invoke-SqlFile $OdsDb 'amt-descriptor-map.sql'
+    Invoke-SqlFile $OdsDb 'descriptor-map.sql'
 }
 
 Write-Host "Building $DataMartDb..."
@@ -81,6 +81,6 @@ Invoke-Db ("psql -U postgres -tc `"SELECT 1 FROM pg_database WHERE datname = '$D
     "|| psql -U postgres -c 'CREATE DATABASE $DataMartDb'")
 # The password comes from the container's environment, so it never appears in a command line here.
 Invoke-Db ("psql -U postgres -d $DataMartDb -q -v ods_db=$OdsDb -v ods_user=postgres " +
-    "-v ods_password=`"`$POSTGRES_PASSWORD`" -f /sql/amt-datamart.sql")
+    "-v ods_password=`"`$POSTGRES_PASSWORD`" -f /sql/datamart.sql")
 
 Write-Host "Done. Data mart: database $DataMartDb, schema analytics."

@@ -3,21 +3,19 @@
 -- The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 -- See the LICENSE and NOTICES files in the project root for more information.
 
--- Builds a PostgreSQL data mart from the Analytics Middle Tier (AMT) views of an Ed-Fi ODS, with the views
--- materialized into tables. Port of AMT-Unreleased-DS-5/samples/AMT-DataMart.sql (T-SQL).
+-- Builds the data mart: copies the analytics views of an Ed-Fi ODS (installed from sql/views) into tables in
+-- a separate database, and indexes them.
 --
 -- Run with psql, connected to the data mart database, on the same server as the ODS:
 --   psql -d edfi_datamart -v ods_db=EdFi_Ods_Northridge -v ods_user=postgres -v ods_password=...
---        -f amt-datamart.sql
+--        -f datamart.sql
 -- Run it again to refresh the data.
 --
--- Differences from the T-SQL script:
+-- How it works:
 --   * reads the ODS through postgres_fdw (PostgreSQL can't query another database directly);
---   * copies every AMT view the ODS has (the collections installed there), instead of a fixed list;
+--   * copies every view in the ODS's analytics schema;
 --   * swaps the staging tables in and builds the indexes in one transaction, so readers never see a
---     half-built mart;
---   * the second-ODS section (commented out in the original) and the fake schema version log are left out:
---     the early warning views are copied as tables like the rest.
+--     half-built mart.
 
 \set ON_ERROR_STOP on
 
@@ -34,7 +32,7 @@ IMPORT FOREIGN SCHEMA edfi LIMIT TO (schoolyeartype) FROM SERVER ods INTO ods_an
 
 CREATE SCHEMA IF NOT EXISTS analytics;
 
--- Staging tables: one per AMT view, with the source school year
+-- Staging tables: one per view, with the source school year
 DO $$
 DECLARE
     v record;
@@ -52,7 +50,7 @@ BEGIN
     END LOOP;
 END $$;
 
--- Swap the staging tables in and build the indexes (index list from the T-SQL script)
+-- Swap the staging tables in and build the indexes
 BEGIN;
 
 DO $$

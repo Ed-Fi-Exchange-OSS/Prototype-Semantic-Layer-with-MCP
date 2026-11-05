@@ -13,8 +13,7 @@ which were further elucidated in the [Ed-Fi and AI Special Interest Group
 ## Contents
 
 - [`datamart/`](./datamart/README.md): the semantic layer, a PostgreSQL data
-  mart for the early warning use case, built from the Northridge sample data
-  with the Analytics Middle Tier.
+  mart for the early warning use case, built from the Northridge sample data.
 
 ## License
 

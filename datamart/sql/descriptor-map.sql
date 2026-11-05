@@ -3,10 +3,10 @@
 -- The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 -- See the LICENSE and NOTICES files in the project root for more information.
 
--- Analytics Middle Tier configuration for the Northridge sample data. Run on the ODS after installing AMT.
+-- Configuration of the analytics views for the Northridge sample data. Run on the ODS after sql/views.
 --
--- rls_UserDim builds one user per staff member from their work email (constant Email.Work), which AMT maps
--- only to the `Work` electronic mail type. Northridge staff emails use the `Organization` type, so without
+-- rls_UserDim builds one user per staff member from their work email (constant Email.Work), which the
+-- default configuration maps only to the `Work` electronic mail type. Northridge staff emails use the `Organization` type, so without
 -- this mapping there are no users and row-level security returns nothing.
 
 INSERT INTO analytics_config.descriptormap (descriptorconstantid, descriptorid, createdate)
