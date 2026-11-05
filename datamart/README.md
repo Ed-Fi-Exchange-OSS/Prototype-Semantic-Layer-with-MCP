@@ -14,7 +14,7 @@ grades, plus the user-to-student mappings that row-level security needs.
 ## Build
 
 ```bash
-cp .env.example .env   # then set POSTGRES_PASSWORD in .env
+cp .env.example .env   # then set POSTGRES_PASSWORD and MCP_READER_PASSWORD
 ./build-datamart.sh    # or ./build-datamart.ps1
 ```
 
@@ -32,6 +32,8 @@ container (`docker-compose.yml`, port 5440 by default):
    (`sql/descriptor-map.sql`).
 4. **Data mart:** `sql/datamart.sql` copies every view into a table in the
    `edfi_datamart` database, schema `analytics`, and indexes them.
+   `sql/mcp-reader.sql` then creates `mcp_reader`, the role the
+   [MCP server](../mcp-server/README.md) uses, which can only read that schema.
 
 To rebuild only the data mart from the ODS, run
 `./build-datamart.sh --refresh-only` (or `./build-datamart.ps1 -RefreshOnly`).

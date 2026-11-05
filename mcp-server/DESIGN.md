@@ -95,3 +95,6 @@ takes about 120 ms.
   travel script moves date and year columns, not text. Cosmetic, but visible in
   answers.
 - **Large sections:** some Northridge sections have about 700 students.
+- **Results dated in the future:** Northridge holds a whole school year, so
+  after the date shift some assessment results fall after today. The tools only
+  count results up to today.

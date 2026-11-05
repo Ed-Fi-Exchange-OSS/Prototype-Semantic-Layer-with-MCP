@@ -3,13 +3,14 @@
 # The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 # See the LICENSE and NOTICES files in the project root for more information.
 
-# PostgreSQL server for the sample ODS and the data mart. Set POSTGRES_PASSWORD in a .env file next to this
-# file (see .env.example).
+# PostgreSQL server for the sample ODS and the data mart, and the MCP server (profile "mcp"). Set the
+# passwords in a .env file next to this file (see .env.example).
 services:
   db:
     image: postgres:16-alpine
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      MCP_READER_PASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
     ports:
       - "${DATAMART_DB_PORT:-5440}:5432"
     volumes:
@@ -19,6 +20,21 @@ services:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
       retries: 30
+
+  mcp-server:
+    profiles: [mcp]
+    build: ../mcp-server
+    environment:
+      PGHOST: db
+      PGDATABASE: edfi_datamart
+      PGUSER: mcp_reader
+      PGPASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-tina.blevins@RidgemontHighSchool.edu}
+    ports:
+      - "${MCP_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   datamart-db:
