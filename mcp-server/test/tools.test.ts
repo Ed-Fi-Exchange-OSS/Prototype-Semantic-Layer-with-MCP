@@ -301,6 +301,51 @@ describe('early warning tools', () => {
         });
     });
 
+    describe('roles', () => {
+        async function roleUser(scope: string): Promise<Row> {
+            const [user] = await rows(
+                `SELECT userkey, schoolpermission FROM analytics.rls_userauthorization
+                 WHERE userscope = $1 ORDER BY userkey LIMIT 1`, [`AuthorizationScope.${scope}`]);
+            return user;
+        }
+
+        test('a principal sees students enrolled at their school, and no one else', async () => {
+            const { userkey, schoolpermission: school } = await roleUser('School');
+            const principal = await connect(userkey);
+            const scope = await json(principal, 'get_my_scope');
+            assert.deepEqual(scope.scopes.map((s: Row) => s.scope), ['School']);
+            const [{ outside }] = await rows(
+                `SELECT count(*)::int AS outside FROM analytics.rls_userstudentdataauthorization a
+                 WHERE a.userkey = $1 AND NOT EXISTS (
+                     SELECT 1 FROM analytics.studentschooldim s
+                     WHERE s.studentkey = a.studentkey AND s.schoolkey = $2)`, [userkey, school]);
+            assert.equal(outside, 0);
+            assert.ok(scope.students > inScope.size, 'more than a teacher');
+            const [other] = await rows(
+                `SELECT s.studentkey FROM analytics.studentschooldim s
+                 WHERE NOT EXISTS (SELECT 1 FROM analytics.rls_userstudentdataauthorization a
+                                   WHERE a.userkey = $1 AND a.studentkey = s.studentkey) LIMIT 1`,
+                [userkey]);
+            const response = await call(principal, 'get_student_summary', { student: other.studentkey });
+            assert.equal(response.isError, true);
+            await principal.close();
+        });
+
+        test('the superintendent sees the district', async () => {
+            const { userkey } = await roleUser('District');
+            const superintendent = await connect(userkey);
+            const scope = await json(superintendent, 'get_my_scope');
+            assert.equal(scope.scopes[0].scope, 'District');
+            assert.ok(scope.scopes[0].district);
+            const [{ n }] = await rows(
+                'SELECT count(DISTINCT studentkey)::int AS n FROM analytics.studentschooldim');
+            assert.equal(scope.students, n);
+            const summary = await json(superintendent, 'get_student_summary', { student: outsider.key });
+            assert.equal(summary.student.key, outsider.key);
+            await superintendent.close();
+        });
+    });
+
     describe('input handling', () => {
         test('rejects values out of range', async () => {
             const cases: [string, Record<string, unknown>][] = [

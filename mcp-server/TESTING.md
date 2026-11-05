@@ -12,15 +12,16 @@ was added.
 
 | Area | What was checked | Result |
 | --- | --- | --- |
-| Automated tests | 22 tests: every tool through an MCP client, checked against direct queries; scope; input handling | ✅ 22/22 pass |
+| Automated tests | 24 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling | ✅ 24/24 pass |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
 | AI assistants | 6 prompts each in Claude Code and GitHub Copilot, in three rounds: 3 a teacher would ask, 3 that try to get data outside the teacher's scope | ✅ 36/36 as expected; no data outside the scope in any answer |
-| Speed | Time per tool for a teacher who may see 716 students | ✅ 8 to 187 ms |
+| Speed | Time per tool for a teacher (716 students), a principal (3,174) and the superintendent (21,194) | ✅ Under 0.2 s for a teacher; the district-wide at-risk list takes 1.3 s |
 
-The demo user for every test is a Ridgemont High School teacher
+The main demo user is a Ridgemont High School teacher
 (`tina.blevins@RidgemontHighSchool.edu`) who may see 716 students in 4
-sections.
+sections. The role tests also use a principal, who may see their school, and
+the superintendent, who may see the district.
 
 ## 1. Automated tests
 
@@ -61,6 +62,11 @@ Output: [`npm-test.txt`](./test/evidence/2026-11-05-behavior/npm-test.txt).
   - SQL in a parameter (`x' OR '1'='1`, `'; DROP TABLE ...`) is treated as text:
     no error, nothing outside the scope, the table is still there;
   - the server's database session can't create tables (read-only).
+- **Roles:**
+  - a principal sees only students enrolled at their school, more than a
+    teacher, and gets nothing for a student of another school;
+  - the superintendent sees every student in the district, including the one
+    outside the teacher's scope, and `get_my_scope` names the district.
 
 ## 2. Database role
 
@@ -161,22 +167,27 @@ ones the user may see**.
 
 ## 5. Speed
 
-Time for one call through the MCP client, for the demo user (716 students),
-on a laptop with the data mart in Docker:
+Time for one call through the MCP client, on a laptop with the data mart in
+Docker:
 
-| Tool | Time |
-| --- | --- |
-| `get_my_scope` | 15 ms |
-| `list_my_sections` | 8 ms |
-| `find_students` | 10 ms |
-| `list_students_at_risk` | 131 ms for one section; 187 ms for all 716 students |
-| `get_student_summary` | 12 ms |
-| `get_attendance_trend` | 30 ms |
+| Tool | Teacher (716 students) | Principal (3,174) | Superintendent (21,194) |
+| --- | --- | --- | --- |
+| `get_my_scope` | 15 ms | 10 ms | 5 ms |
+| `list_my_sections` | 8 ms | 3 ms | 3 ms |
+| `find_students` | 10 ms | 11 ms | 9 ms |
+| `list_students_at_risk` | 187 ms (131 ms for one section) | 1,048 ms | 1,336 ms |
+| `get_student_summary` | 12 ms | 5 ms | 11 ms |
+| `get_attendance_trend` | 30 ms | not measured | not measured |
+
+The at-risk list reads every day of attendance for every student in scope, so
+it grows with the scope; it stays under a second and a half for the whole
+district.
 
 ## Not tested yet
 
-- Sign-in through OAuth and roles other than teachers (later phases):
-  principals and superintendents have no scope in the sample data yet.
+- Sign-in through OAuth (later phases); the roles were tested with demo users.
+- Assistant principals and the LEA administrator: the sample data doesn't map
+  their staff classifications to a scope, so they see no students.
 - Lineage in the results (later phases).
 - Other MCP clients (Claude Desktop, VS Code) beyond the two CLIs above; they
   use the same transport.

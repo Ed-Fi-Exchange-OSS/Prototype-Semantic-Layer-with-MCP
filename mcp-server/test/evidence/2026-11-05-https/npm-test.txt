@@ -25,15 +25,18 @@
         ok 3 - an extra "user" argument doesn't change whose data comes back
         ok 4 - a session with no user gets an error, not data
     ok 7 - scope
+        ok 1 - a principal sees students enrolled at their school, and no one else
+        ok 2 - the superintendent sees the district
+    ok 8 - roles
         ok 1 - rejects values out of range
         ok 2 - treats SQL in a parameter as plain text
         ok 3 - the server's database session is read-only
-    ok 8 - input handling
-# tests 22
-# suites 9
-# pass 22
+    ok 9 - input handling
+# tests 24
+# suites 10
+# pass 24
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1883.7729
+# duration_ms 1767.4125

@@ -7,11 +7,13 @@
 
 SELECT
     (SELECT useremail FROM analytics.rls_userdim WHERE userkey = $1) AS email,
-    (SELECT json_agg(DISTINCT jsonb_build_object(
+    (SELECT json_agg(DISTINCT jsonb_strip_nulls(jsonb_build_object(
                 'scope', replace(ua.userscope, 'AuthorizationScope.', ''),
-                'school', sc.schoolname))
+                'school', sc.schoolname,
+                'district', lea.localeducationagencyname)))
      FROM analytics.rls_userauthorization ua
      LEFT JOIN analytics.schooldim sc ON sc.schoolkey = ua.schoolpermission
+     LEFT JOIN analytics.localeducationagencydim lea ON lea.localeducationagencykey = ua.districtid
      WHERE ua.userkey = $1) AS scopes,
     (SELECT count(DISTINCT sectionkey)::int FROM analytics.staffsectiondim WHERE userkey = $1) AS sections,
     (SELECT count(*)::int FROM analytics.rls_userstudentdataauthorization WHERE userkey = $1) AS students;

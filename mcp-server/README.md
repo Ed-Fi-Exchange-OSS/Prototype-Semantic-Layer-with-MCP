@@ -43,10 +43,19 @@ server connects to the data mart as `mcp_reader`, a role that can only read the
 `analytics` schema.
 
 To choose another demo user, set `DEMO_USER_EMAIL` in `datamart/.env` to a staff
-email from the data mart, for example:
+email from the data mart. What the user sees follows their role:
+
+- a teacher, the students in their sections (for example
+  `tina.blevins@RidgemontHighSchool.edu`);
+- a principal, the students of their school (for example
+  `carmen.helms@RidgemontHighSchool.edu`);
+- the superintendent, the whole district (`superintendent@NorthridgeISD.edu`).
 
 ```sql
-SELECT useremail FROM analytics.rls_userdim LIMIT 10;
+SELECT u.useremail, a.userscope
+FROM analytics.rls_userdim u
+JOIN analytics.rls_userauthorization a ON a.userkey = u.userkey
+LIMIT 10;
 ```
 
 ## Connect an assistant
