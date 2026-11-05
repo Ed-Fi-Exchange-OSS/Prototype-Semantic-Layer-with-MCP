@@ -4,21 +4,21 @@
 - **Owner:** Stephen Fuqua (Ed-Fi Alliance); written by Rafael Ceballos
   (Simpat Tech)
 - **Repository:** Ed-Fi-Exchange-OSS/Prototype-Semantic-Layer-with-MCP
-- **Jira:** epic DEVOPS-180 (Early Warning System MCP Server POC), tasks
-  DEVOPS-181 to DEVOPS-187
-- **Sources:** Project Brief "Semantic Layer and Model Context Protocol (MCP)
-  for Ed-Fi" (Ed-Fi and AI SIG, Confluence); the DEVOPS-180 tasks; Stephen
-  Fuqua's answers on Slack (2026-11-04 and 2026-11-05)
+- **Source:** [Project Brief: Semantic Layer and Model Context Protocol (MCP)
+  for Ed-Fi][brief]
 - **Architecture decisions:** [ADR 0001](adr/0001-mcp-server-architecture.md)
+
+[brief]:
+  https://edfi.atlassian.net/wiki/spaces/ESIG/pages/2776858626/Project+Brief+Semantic+Layer+and+Model+Context+Protocol+MCP+for+Ed-Fi
 
 ## 1. Product overview
 
 MCP for Early Warning is a proof of concept of the pattern the Ed-Fi Alliance
-recommends for AI applications that work with Ed-Fi data: Ed-Fi operational
-data is reshaped into a small semantic layer around analytical concepts, access
-is limited to what each user may see, and the AI application gets a few
-curated, deterministic operations through the Model Context Protocol (MCP)
-instead of open access to SQL or the Ed-Fi API.
+recommends for AI applications that work with the Ed-Fi Data Standard:
+operational data is reshaped into a small semantic layer around analytical
+concepts, access is limited to what each user may see, and the AI application
+gets a few curated, deterministic operations through the Model Context Protocol
+(MCP) instead of open access to SQL or the Ed-Fi API.
 
 The proof of concept uses the early warning use case: helping educators find
 students at risk from attendance, behavior, course performance and assessment
@@ -41,6 +41,8 @@ community can adapt to build its own semantic layers and MCP servers.
   - the OpenAPI specification is too large to load into an AI system's context.
 - **Release objective:** a working proof of concept by the November 2026 Ed-Fi
   Summit, with API-native lineage targeted for 2027.
+- **Success:** anyone can clone the repository and run the demonstration on
+  their own.
 - **Related initiatives:** 1EdTech Trusted Portable Learning Context (TPLC), on
   consent, provenance and audit trails for AI access; data lineage as a
   priority for Ed-Fi API 8 (2027).
@@ -54,8 +56,8 @@ community can adapt to build its own semantic layers and MCP servers.
   students in their sections. First persona delivered.
 - **Principal:** wants a school-wide view of students at risk and of
   attendance trends. Sees the students of their school.
-- **Counselor:** wants to follow the students on their caseload. Sees only that
-  caseload.
+- **Counselor:** wants to follow the students on their caseload. Not planned
+  for this proof of concept.
 - **Superintendent:** wants district-wide trends. Sees the district's students.
 - **Student or family:** sees only their own records. Emerging; not planned for
   this proof of concept.
@@ -165,11 +167,10 @@ Ed-Fi ODS (Northridge sample data)
 
 - **FR-AUTH-1:** The MCP server SHALL authenticate users with OAuth access
   tokens through Ed-Fi Admin App user management.
-- **FR-AUTH-2:** Admin App users SHALL be linked to Ed-Fi staff records and
-  their roles.
+- **FR-AUTH-2:** Admin App users SHALL be linked to Ed-Fi staff records, and
+  through them to their roles, by email address.
 - **FR-AUTH-3:** Access SHALL follow the role: a teacher sees their sections'
-  students; a principal, their school; a superintendent, their district; a
-  counselor, their caseload.
+  students; a principal, their school; a superintendent, their district.
 
 ### Lineage (later phases)
 
@@ -256,16 +257,14 @@ The implementation decisions are recorded in
 
 ### Phased delivery
 
-1. Sample semantic layer on Northridge for the early warning use case
-   (DEVOPS-181).
-2. Design of the MCP tools and the server (DEVOPS-182).
+1. Sample semantic layer on Northridge for the early warning use case.
+2. Design of the MCP tools and the server.
 3. Tools that query the semantic layer, for a configured demo user, without
-   sign-in (DEVOPS-183).
-4. Sign-in through Ed-Fi Admin App user management with OAuth (DEVOPS-184).
-   1. Admin App users linked to staff roles, with access for each role
-      (DEVOPS-185).
-5. Design of the lineage records, populated by hand (DEVOPS-186).
-6. Lineage reported by the tools (DEVOPS-187).
+   sign-in.
+4. Sign-in through Ed-Fi Admin App user management with OAuth.
+   1. Admin App users linked to staff roles, with access for each role.
+5. Design of the lineage records, populated by hand.
+6. Lineage reported by the tools.
 
 ## 6. Out of scope and known limitations
 
@@ -278,7 +277,7 @@ The implementation decisions are recorded in
 - Free-form questions answered by generated SQL or direct Ed-Fi API calls.
 - Use cases other than early warning, such as school-to-workforce tracking
   (named in the Project Brief as a candidate).
-- Access for students and families.
+- Access for counselors (caseloads), students and families.
 - API-native lineage (planned for Ed-Fi API 8).
 
 ### Known limitations of the sample data
@@ -301,31 +300,9 @@ The implementation decisions are recorded in
 - An AI application can still misread or misreport correct data. The tools
   reduce, but don't remove, the need for educators to check what they act on.
 
-## 7. Open questions and decision log
+## 7. Open questions
 
-### Open questions
-
-- What does success look like for the proof of concept: a demonstration at the
-  Summit, use in SIG sessions, or community adoption?
-- Will counselors (caseload access) be part of a phase? The sample data has no
-  caseloads.
-- Is the "fuzzy lookup" for data discovery in the Project Brief (finding how a
-  source field maps to an Ed-Fi entity) part of this proof of concept or a
-  separate one?
-- Which Admin App version, and how are its users linked to staff records?
-
-### Decision log
-
-- **2026-11-04:** Northridge's dates may be adjusted to the current school year;
-  a new sample data set isn't feasible. (Stephen Fuqua)
-- **2026-11-05:** The proof of concept lives in this repository; the MCP server
-  sits next to the semantic layer. (Stephen Fuqua)
-- **2026-11-05:** The teacher's view comes first; the principal's view comes
-  with the role mapping. (Stephen Fuqua)
-- **2026-11-05:** No preference on programming language; the implementation
-  choice is in ADR 0001. (Stephen Fuqua)
-- **2026-11-05:** The documentation doesn't refer to the product the analytics
-  views came from; it describes the views on their own. (Stephen Fuqua)
+None at this time.
 
 ## 8. Glossary
 
