@@ -62,6 +62,37 @@ BEGIN
         END IF;
     END LOOP;
 
+    -- Years written into names and identifiers, so they match the new dates. Only the years of the school
+    -- year being moved are changed:
+    --   session names start with the two years ("2017 - 2018 Fall Semester");
+    --   section identifiers end with them ("..._20172018");
+    --   calendar codes end with the school year ("255901001_2018").
+    FOR col IN
+        SELECT c.table_schema, c.table_name, c.column_name
+        FROM information_schema.columns c
+        JOIN information_schema.tables t USING (table_schema, table_name)
+        WHERE t.table_type = 'BASE TABLE'
+          AND c.table_schema = 'edfi'
+          AND c.column_name IN ('sessionname', 'sectionidentifier', 'sourcesectionidentifier', 'calendarcode')
+        ORDER BY 1, 2, 3
+    LOOP
+        EXECUTE format($sql$
+            UPDATE %1$I.%2$I SET %3$I = CASE
+                WHEN %3$I ~ '^\d{4} - \d{4} '
+                     AND substr(%3$I, 1, 4)::int BETWEEN %4$s - 1 AND %4$s
+                    THEN (substr(%3$I, 1, 4)::int + %5$s)::text || ' - '
+                         || (substr(%3$I, 8, 4)::int + %5$s)::text || substr(%3$I, 12)
+                WHEN %3$I ~ '_\d{8}$'
+                     AND substr(right(%3$I, 8), 1, 4)::int BETWEEN %4$s - 1 AND %4$s
+                    THEN left(%3$I, -8) || (substr(right(%3$I, 8), 1, 4)::int + %5$s)::text
+                         || (substr(right(%3$I, 8), 5, 4)::int + %5$s)::text
+                WHEN %3$I ~ '_\d{4}$' AND right(%3$I, 4)::int = %4$s
+                    THEN left(%3$I, -4) || (right(%3$I, 4)::int + %5$s)::text
+                ELSE %3$I END
+            WHERE %3$I ~ '(^\d{4} - \d{4} |_\d{8}$|_\d{4}$)'
+            $sql$, col.table_schema, col.table_name, col.column_name, existing_year, year_diff);
+    END LOOP;
+
     UPDATE edfi.schoolyeartype SET currentschoolyear = (schoolyear = target_year);
 END $$;
 

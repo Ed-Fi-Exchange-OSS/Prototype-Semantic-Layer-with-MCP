@@ -25,7 +25,8 @@ container (`docker-compose.yml`, port 5440 by default):
    21,600 students in 13 schools) and restores it as `EdFi_Ods_Northridge`.
 2. **Current school year:** Northridge holds the 2017-2018 school year.
    `sql/time-travel.sql` moves every date to the current school year, keeping
-   weekdays, so the views that look for current enrollments return data.
+   weekdays, and the year in session names, section identifiers and calendar
+   codes, so the views that look for current enrollments return data.
 3. **Analytics views:** installs the views (`sql/views`) on the ODS, and maps
    Northridge's staff email type so each staff member becomes a user
    (`sql/descriptor-map.sql`).
