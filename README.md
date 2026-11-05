@@ -10,6 +10,12 @@ Forward](https://docs.ed-fi.org/getting-started/provider-playbook/implementation
 which were further elucidated in the [Ed-Fi and AI Special Interest Group
 2026](https://edfi.atlassian.net/wiki/spaces/ESIG/pages/2361622529/Ed-Fi+and+AI+Special+Interest+Group+2026).
 
+## Contents
+
+- [`docs/PRD.md`](./docs/PRD.md): product requirements for the early warning
+  proof of concept.
+- [`docs/adr/`](./docs/adr/): architecture decisions.
+
 ## License
 
 Copyright (c) 2026, Ed-Fi Alliance, LLC. All rights reserved.
