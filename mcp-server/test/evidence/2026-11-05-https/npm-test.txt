@@ -1,0 +1,39 @@
+# Subtest: early warning tools
+        ok 1 - has the six tools, each read-only and described
+        ok 2 - no tool takes a user, SQL, table or column as a parameter
+    ok 1 - tool list
+        ok 1 - get_my_scope matches the authorization tables
+        ok 2 - list_my_sections returns only the teacher's sections
+    ok 2 - get_my_scope and list_my_sections
+        ok 1 - matches part of the name, ignoring case, within scope
+        ok 2 - filters by section
+        ok 3 - caps the rows and says when it did
+    ok 3 - find_students
+        ok 1 - every student is in scope, and the indicators match the numbers
+        ok 2 - is sorted by indicators, then by absence rate
+        ok 3 - uses the absence threshold it is given
+        ok 4 - counts discipline actions up to today, once each
+        ok 5 - filters by section
+    ok 4 - list_students_at_risk
+        ok 1 - matches the data mart for a student in scope
+    ok 5 - get_student_summary
+        ok 1 - returns at most the weeks asked for, each starting on a Monday
+        ok 2 - needs exactly one of student and section
+    ok 6 - get_attendance_trend
+        ok 1 - a student outside the teacher's scope returns nothing from any tool
+        ok 2 - another teacher who may see that student gets it
+        ok 3 - an extra "user" argument doesn't change whose data comes back
+        ok 4 - a session with no user gets an error, not data
+    ok 7 - scope
+        ok 1 - rejects values out of range
+        ok 2 - treats SQL in a parameter as plain text
+        ok 3 - the server's database session is read-only
+    ok 8 - input handling
+# tests 22
+# suites 9
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1883.7729

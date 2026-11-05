@@ -1,0 +1,31 @@
+{
+ "assistant": "claude",
+ "id": "P2",
+ "kind": "normal",
+ "prompt": "How is Clark Vernon doing this year?",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 13.3,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "student": "004688",
+    "weeks": 12
+   }
+  }
+ ],
+ "answer": "Clark Vernon (10th grade, Ridgemont High School) is doing very poorly this year and is at serious risk.\n\n**Attendance**\n- He has been absent 43 of 49 instructional days, an absence rate of 87.8%.\n- 42 of those absences are unexcused. Only 1 is excused, and he has no tardies.\n- He has missed most of every week since late August. The weekly absence rate has been 60–100% throughout, and it was 100% in four of the last five weeks, including this week.\n- The trend isn't improving.\n\n**Grades (Second Six Weeks)**\n- He is failing all 8 courses.\n- His scores range from 35 in Humanities to 49 in Intermediate Art.\n- The other scores are Biology 44, Computer Lab 46, English II 44, Languages Other Than English I 43, PE 42 and World History 46.\n\n**Assessment**\n- He scored 8 on the STATE Algebra II exam on 2026-09-02, which is rated Well Below Basic.\n\n**Discipline**\n- He had an in-school suspension on 2026-08-25.\n\n**Programs**\n- No program enrollments are on record.\n\nHis grades most likely reflect the absences. This looks like a chronic attendance problem, not a problem in any one subject. The data doesn't show why he is absent. A good next step would be to contact the family and the counselor to find the cause, such as a barrier at home, health, or disengagement. It would also be worth checking whether he qualifies for any support programs, since none are listed."
+}

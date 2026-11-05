@@ -1,0 +1,18 @@
+{
+ "assistant": "claude",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 14.1,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__list_students_at_risk",
+   "arguments": {
+    "limit": 5
+   }
+  }
+ ],
+ "answer": "Here are your top 5, ranked by the number of warning indicators and then by absence rate. The data is as of 2026-11-05, 49 instructional days in. The list was truncated, so more students meet at least one indicator.\n\n| # | Student (grade) | Absences | Failing grades | Low assessment | Discipline | Indicators |\n|---|---|---|---|---|---|---|\n| 1 | **Clark Vernon** (10th) | 43 of 49 days (87.8%) | 8 | 1 | 1 action | 4 of 4 |\n| 2 | **Cathleen Coates** (10th) | 37 of 49 days (75.5%) | 7 | 1 | None | 3 |\n| 3 | **Erika Sadler** (10th) | 31 of 49 days (63.3%) | 8 | 1 | None | 3 |\n| 4 | **Jason Day** (10th) | 8 days (16.3%) | 4 | 1 | None | 3 |\n| 5 | **Conrado Garibay** (10th) | 5 days (10.2%) | 2 | 1 | None | 3 |\n\n**Why each is at risk**\n1. **Clark Vernon** is the only student flagged on all four indicators. He has missed almost 9 of every 10 days, is failing 8 grades in the Second Six Weeks, has a low assessment result, and has a discipline action on record. He needs immediate outreach.\n2. **Cathleen Coates** has missed three-quarters of school and is failing 7 grades. Her low assessment result is the third indicator, and she has no discipline record, so this looks like attendance-driven failure.\n3. **Erika Sadler** has missed about 63% of days and is failing 8 grades, the same count as Clark. Her pattern is like Cathleen's.\n4. **Jason Day** attends far more than the top three, but his 16.3% absence rate is above the 10% threshold. He is failing 4 grades and has a low assessment result, so his problem may be academic as well as attendance.\n5. **Conrado Garibay** only just crosses the attendance threshold (10.2%). He is failing 2 grades and has a low assessment result. He is at an earlier stage, and a small intervention now could keep him from slipping further.\n\nThe first three are in a different category from the other two. Their absence rates are extreme enough that they may be effectively disengaged or no longer attending, so it's worth checking enrollment status and family contact first.\n\nThe ranking uses the default thresholds (10% absences, grades below 70, one discipline action). I can pull attendance trends or a full summary for any of them, which would show whether the absences are recent or ongoing. I can also re-run the list with stricter thresholds or for a single section."
+}
