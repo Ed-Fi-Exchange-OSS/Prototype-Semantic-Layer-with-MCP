@@ -30,7 +30,7 @@ $DataMartDb = 'edfi_datamart'
 $NorthridgeFile = 'EdFi_Ods_Northridge_v73_20241230_PG13.7z'
 # Same file as Ed-Fi-ODS-Implementation's DatabaseTemplate/Scripts/NorthridgePostgreSql.ps1
 $NorthridgeUrl = "https://odsassets.blob.core.windows.net/public/Northridge/$NorthridgeFile"
-$ViewFolders = 'Base', 'Asmt', 'Ews', 'Chrab', 'RLS'
+$ViewFolders = 'Base', 'Asmt', 'Ews', 'Chrab', 'RLS', 'Discipline'
 
 function Invoke-Db {
     param([string] $Command)

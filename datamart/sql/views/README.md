@@ -11,5 +11,6 @@ Data Standard 5.2, focused on a few use cases. They create the views in the
 | `Ews` | Early warning: daily attendance and discipline, section grades |
 | `Chrab` | Chronic absenteeism |
 | `RLS` | Row-level security: users and the students each one may see |
+| `Discipline` | Discipline actions: the student, the date and the type of action |
 
 Install `Base` first, then the other folders, each in file-name order.

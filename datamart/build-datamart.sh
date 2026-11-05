@@ -30,7 +30,7 @@ datamart_db=edfi_datamart
 northridge_file=EdFi_Ods_Northridge_v73_20241230_PG13.7z
 # Same file as Ed-Fi-ODS-Implementation's DatabaseTemplate/Scripts/NorthridgePostgreSql.ps1
 northridge_url="https://odsassets.blob.core.windows.net/public/Northridge/$northridge_file"
-view_folders=(Base Asmt Ews Chrab RLS)
+view_folders=(Base Asmt Ews Chrab RLS Discipline)
 
 db() {
     # stdin from /dev/null, or docker would read the file list of the loop that calls this

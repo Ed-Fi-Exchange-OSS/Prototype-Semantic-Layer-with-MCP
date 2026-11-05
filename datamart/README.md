@@ -43,6 +43,7 @@ To rebuild only the data mart from the ODS, run
 | `ews_studentsectiongradefact` | Grades per student, section and grading period |
 | `chrab_chronicabsenteeismattendancefact` | Daily attendance for chronic absenteeism |
 | `asmt_studentassessmentfact`, `asmt_assessmentfact` | Assessment results and assessments |
+| `equity_studentdisciplineactiondim` | Discipline actions per student: date and type (removal from classroom, suspension, expulsion) |
 | `studentschooldim`, `studentsectiondim`, `schooldim`, `sectiondim`, `datedim`, ... | Dimensions |
 | `rls_userdim` | One user per staff member, keyed by email |
 | `rls_userstudentdataauthorization` | The students each user may see |
