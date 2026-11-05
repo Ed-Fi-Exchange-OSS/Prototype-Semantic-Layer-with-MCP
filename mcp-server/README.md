@@ -3,8 +3,9 @@
 An MCP server with early warning tools on the
 [data mart](../datamart/README.md). An AI assistant connected to it can answer
 questions such as "which of my students are at risk?" for the signed-in
-educator, and only about the students that educator may see. The design is in
-[DESIGN.md](./DESIGN.md).
+educator, and only about the students that educator may see. The requirements
+are in [docs/PRD.md](../docs/PRD.md) and the architecture decisions in
+[ADR 0001](../docs/adr/0001-mcp-server-architecture.md).
 
 This first version has no sign-in: a demo user, set with `DEMO_USER_EMAIL`,
 stands in for the signed-in educator.
