@@ -3,7 +3,9 @@
 // The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 // See the LICENSE and NOTICES files in the project root for more information.
 
-import { createServer as createHttpServer } from 'node:http';
+import { readFileSync } from 'node:fs';
+import { createServer as createHttpServer, type RequestListener } from 'node:http';
+import { createServer as createHttpsServer } from 'node:https';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -34,7 +36,7 @@ if (process.argv.includes('--stdio')) {
 } else {
     const port = Number(process.env.PORT ?? 3000);
     // Stateless: a new server and transport for each request, so requests share nothing.
-    createHttpServer(async (req, res) => {
+    const handler: RequestListener = async (req, res) => {
         if (req.url !== '/mcp') {
             res.writeHead(404).end();
             return;
@@ -47,5 +49,15 @@ if (process.argv.includes('--stdio')) {
         });
         await server.connect(transport);
         await transport.handleRequest(req, res);
-    }).listen(port, () => console.error(`Early warning MCP server on http://localhost:${port}/mcp`));
+    };
+    // HTTPS when given a certificate and key (TLS_CERT_FILE, TLS_KEY_FILE); plain HTTP otherwise, for
+    // development.
+    const certFile = process.env.TLS_CERT_FILE;
+    const keyFile = process.env.TLS_KEY_FILE;
+    const secure = Boolean(certFile && keyFile);
+    const httpServer = secure
+        ? createHttpsServer({ cert: readFileSync(certFile!), key: readFileSync(keyFile!) }, handler)
+        : createHttpServer(handler);
+    httpServer.listen(port, () => console.error(
+        `Early warning MCP server on ${secure ? 'https' : 'http'}://localhost:${port}/mcp`));
 }

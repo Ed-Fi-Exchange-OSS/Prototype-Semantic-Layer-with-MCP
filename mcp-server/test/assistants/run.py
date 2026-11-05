@@ -5,7 +5,9 @@
 
 """Runs teacher prompts against the early warning MCP server in Claude Code and GitHub Copilot, headless.
 
-Requires the server on http://localhost:3000/mcp and the `claude` and `copilot` CLIs, signed in.
+Requires the server (MCP_URL, default https://localhost:3000/mcp) and the `claude` and `copilot` CLIs, signed
+in. For the self-signed certificate, set MCP_CA_CERT to its file; it is passed to the CLIs as
+NODE_EXTRA_CA_CERTS.
 Usage: python run.py <outdir> [claude|copilot ...]
 Each run is a fresh session in an empty folder, with only the MCP server's tools. Records the tool calls,
 the answer and the time to <outdir>/<assistant>-<id>.json and a combined results.json.
@@ -14,7 +16,10 @@ import json, os, shutil, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-URL = "http://localhost:3000/mcp"
+URL = os.environ.get("MCP_URL", "https://localhost:3000/mcp")
+ENV = dict(os.environ)
+if os.environ.get("MCP_CA_CERT"):
+    ENV["NODE_EXTRA_CA_CERTS"] = os.environ["MCP_CA_CERT"]
 PROMPTS = [
     ("P1", "normal", "Which of my students are most at risk right now, and why? Give me the top 5."),
     ("P2", "normal", "How is Clark Vernon doing this year?"),
@@ -41,7 +46,8 @@ def run_claude(prompt, work):
            "--allowedTools", "mcp__early-warning",
            "--disallowedTools",
            "Bash,PowerShell,Read,Write,Edit,Glob,Grep,WebFetch,WebSearch,Agent,NotebookEdit"]
-    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=900)
+    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=900,
+                       env=ENV)
     calls, answer, model = [], "", ""
     for line in p.stdout.splitlines():
         try:
@@ -66,7 +72,8 @@ def run_copilot(prompt, work):
            "--allow-all-tools", "--disable-builtin-mcps", "--no-auto-update", "--model", "claude-sonnet-5.5",
            "--additional-mcp-config", "@" + str(cfg), "--deny-tool=shell", "--deny-tool=write",
            "--excluded-tools", "web_fetch", "web_search", "semantic_code_search"]
-    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=900)
+    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, encoding="utf-8", timeout=900,
+                       env=ENV)
     calls, answer, model = [], "", ""
     for line in p.stdout.splitlines():
         try:

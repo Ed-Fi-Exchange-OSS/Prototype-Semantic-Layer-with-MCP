@@ -36,8 +36,10 @@ Build the data mart first (see [`datamart/`](../datamart/README.md)), with
 docker compose --profile mcp up -d --build
 ```
 
-The server listens on `http://localhost:3000/mcp` (Streamable HTTP). It
-connects to the data mart as `mcp_reader`, a role that can only read the
+The server listens on `https://localhost:3000/mcp` (Streamable HTTP). The first
+start creates a self-signed certificate for `localhost` in
+`mcp-server/certs/server.crt`; MCP clients have to trust it (see below). The
+server connects to the data mart as `mcp_reader`, a role that can only read the
 `analytics` schema.
 
 To choose another demo user, set `DEMO_USER_EMAIL` in `datamart/.env` to a staff
@@ -49,18 +51,26 @@ SELECT useremail FROM analytics.rls_userdim LIMIT 10;
 
 ## Connect an assistant
 
-Claude Code:
+The certificate is self-signed, so each client has to trust it.
+
+Claude Code and the GitHub Copilot CLI run on Node.js: point
+`NODE_EXTRA_CA_CERTS` to the certificate before starting them, for example from
+the repository root:
 
 ```bash
-claude mcp add --transport http early-warning http://localhost:3000/mcp
+export NODE_EXTRA_CA_CERTS="$PWD/mcp-server/certs/server.crt"
+claude mcp add --transport http early-warning https://localhost:3000/mcp
 ```
 
-VS Code (GitHub Copilot), in `.vscode/mcp.json`:
+VS Code (GitHub Copilot) uses the operating system's trusted certificates: add
+`server.crt` to them (on Windows, "Trusted Root Certification Authorities" for
+the current user; on macOS, the login keychain, set to "Always Trust"), then in
+`.vscode/mcp.json`:
 
 ```json
 {
   "servers": {
-    "early-warning": { "type": "http", "url": "http://localhost:3000/mcp" }
+    "early-warning": { "type": "http", "url": "https://localhost:3000/mcp" }
   }
 }
 ```
@@ -75,7 +85,7 @@ Requires Node.js 22.
 ```bash
 npm ci
 npm run build
-npm start              # HTTP on port 3000 (PORT to change it)
+npm start              # port 3000 (PORT); HTTPS with TLS_CERT_FILE and TLS_KEY_FILE
 node dist/src/index.js --stdio
 ```
 
