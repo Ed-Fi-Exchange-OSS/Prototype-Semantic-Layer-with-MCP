@@ -6,7 +6,6 @@
 - **Repository:** Ed-Fi-Exchange-OSS/Prototype-Semantic-Layer-with-MCP
 - **Source:** [Project Brief: Semantic Layer and Model Context Protocol (MCP)
   for Ed-Fi][brief]
-- **Architecture decisions:** [ADR 0001](adr/0001-mcp-server-architecture.md)
 
 [brief]:
   https://edfi.atlassian.net/wiki/spaces/ESIG/pages/2776858626/Project+Brief+Semantic+Layer+and+Model+Context+Protocol+MCP+for+Ed-Fi
@@ -252,8 +251,8 @@ Ed-Fi ODS (Northridge sample data)
 | Identity | User sign-in and roles (later phase) | Ed-Fi Admin App | Users, roles, links to staff |
 | AI application | Asks questions on the user's behalf | Any MCP client | None |
 
-The implementation decisions are recorded in
-[ADR 0001](adr/0001-mcp-server-architecture.md).
+The implementation decisions are recorded as architecture decision records in
+[`docs/adr/`](adr/).
 
 ### Phased delivery
 
