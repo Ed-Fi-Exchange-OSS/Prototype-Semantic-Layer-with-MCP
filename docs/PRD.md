@@ -288,9 +288,8 @@ The implementation decisions are recorded as architecture decision records in
   from discipline actions, which do name the student. Incident details (what
   happened, where) aren't available per student.
 - Northridge has class attendance only, no daily school attendance.
-- Moving the sample data to the current school year shifts dates, not text, so
-  session names still show the original school year; some results fall after
-  today and are ignored.
+- Northridge holds a whole school year, so after moving it to the current one,
+  some results fall after today; they are ignored.
 - Some Northridge sections are unusually large (about 700 students).
 
 ### Assumptions and risks
