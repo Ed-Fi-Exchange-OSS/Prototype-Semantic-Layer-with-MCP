@@ -52,7 +52,7 @@ community can adapt to build its own semantic layers and MCP servers.
 
 - **Teacher:** wants to know which students in their sections need attention
   and why, without exporting data or learning a reporting tool. Sees only the
-  students in their sections. First persona delivered.
+  students in their sections.
 - **Principal:** wants a school-wide view of students at risk and of
   attendance trends. Sees the students of their school.
 - **Counselor:** wants to follow the students on their caseload. Not planned
@@ -281,8 +281,9 @@ The implementation decisions are recorded as architecture decision records in
 
 ### Known limitations of the sample data
 
-- In the sample data, only teachers have an access scope today; principals and
-  superintendents need their staff classifications mapped (phase 4.1).
+- The sample data maps teachers, principals and the superintendent to an
+  access scope; assistant principals and the district administrator have none,
+  so they see no students.
 - Northridge doesn't link students to discipline incidents, so behavior comes
   from discipline actions, which do name the student. Incident details (what
   happened, where) aren't available per student.
