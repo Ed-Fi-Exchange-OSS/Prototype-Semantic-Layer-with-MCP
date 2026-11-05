@@ -21,8 +21,8 @@ curated, deterministic operations through the Model Context Protocol (MCP)
 instead of open access to SQL or the Ed-Fi API.
 
 The proof of concept uses the early warning use case: helping educators find
-students at risk from attendance, course performance and assessment results,
-and see why.
+students at risk from attendance, behavior, course performance and assessment
+results, and see why.
 
 It is a demonstration, not a product the Alliance will run or support. Its
 deliverables are working code, reference patterns and documentation that the
@@ -146,8 +146,9 @@ Ed-Fi ODS (Northridge sample data)
   that has started.
 - **FR-RISK-4:** The assessment indicator SHALL flag a student with a failing
   or "well below basic" result this school year, up to today.
-- **FR-RISK-5:** The system SHOULD add a behavior indicator from discipline
-  incidents when the semantic layer has that data.
+- **FR-RISK-5:** The behavior indicator SHALL flag a student with at least a
+  given number of discipline actions (removal from class, suspension,
+  expulsion) this school year, up to today (default 1).
 - **FR-RISK-6:** The list SHALL be sorted by the number of indicators, then by
   absence rate, and MAY be limited to one section.
 - **FR-RISK-7:** The thresholds SHALL be parameters the user can change.
@@ -155,8 +156,8 @@ Ed-Fi ODS (Northridge sample data)
 ### Student summary and trends
 
 - **FR-STUDENT-1:** The system SHALL summarize one student: attendance so far,
-  grades in the latest grading period, assessment results up to today, and
-  programs.
+  grades in the latest grading period, assessment results and discipline
+  actions up to today, and programs.
 - **FR-TREND-1:** The system SHALL show absences per week over a given number
   of weeks, for one student or for a section.
 
@@ -284,8 +285,9 @@ The implementation decisions are recorded in
 
 - In the sample data, only teachers have an access scope today; principals and
   superintendents need their staff classifications mapped (phase 4.1).
-- The early warning data has no behavior counts yet, although the source has
-  discipline incidents.
+- Northridge doesn't link students to discipline incidents, so behavior comes
+  from discipline actions, which do name the student. Incident details (what
+  happened, where) aren't available per student.
 - Northridge has class attendance only, no daily school attendance.
 - Moving the sample data to the current school year shifts dates, not text, so
   session names still show the original school year; some results fall after
