@@ -165,12 +165,12 @@ describe('early warning tools', () => {
     describe('list_students_at_risk', () => {
         test('every student is in scope, and the indicators match the numbers', async () => {
             const { students, thresholds } = await json(client, 'list_students_at_risk', { limit: 100 });
-            assert.deepEqual(thresholds, { absence_rate: 10, passing_grade: 70 });
+            assert.deepEqual(thresholds, { absence_rate: 10, passing_grade: 70, discipline_actions: 1 });
             assert.ok(students.length > 0);
             for (const s of students) {
                 assert.ok(inScope.has(s.key), s.key);
                 const expected = Number(s.absence_rate >= 10) + Number(s.failing_grades > 0)
-                    + Number(s.low_assessments > 0);
+                    + Number(s.low_assessments > 0) + Number(s.discipline_actions >= 1);
                 assert.equal(s.indicators, expected, s.key);
                 assert.ok(s.indicators >= 1);
             }
@@ -189,9 +189,29 @@ describe('early warning tools', () => {
             const { students } = await json(client, 'list_students_at_risk',
                 { absence_threshold: 50, limit: 100 });
             for (const s of students) {
-                assert.ok(s.absence_rate >= 50 || s.failing_grades > 0 || s.low_assessments > 0, s.key);
+                assert.ok(s.absence_rate >= 50 || s.failing_grades > 0 || s.low_assessments > 0
+                    || s.discipline_actions >= 1, s.key);
                 assert.equal(s.indicators, Number(s.absence_rate >= 50) + Number(s.failing_grades > 0)
-                    + Number(s.low_assessments > 0));
+                    + Number(s.low_assessments > 0) + Number(s.discipline_actions >= 1));
+            }
+        });
+
+        test('counts discipline actions up to today, once each', async () => {
+            const { students } = await json(client, 'list_students_at_risk', { limit: 100 });
+            const flagged = students.filter((s: Row) => s.discipline_actions > 0);
+            assert.ok(flagged.length > 0, 'some students in scope have discipline actions');
+            for (const s of flagged.slice(0, 5)) {
+                const [{ n }] = await rows(
+                    `SELECT count(DISTINCT regexp_replace(studentdisciplineactionkey, '-[^-]*$', ''))::int
+                            AS n
+                     FROM analytics.equity_studentdisciplineactiondim
+                     WHERE studentkey = $1 AND disciplinedatekey <= $2`, [s.key, today]);
+                assert.equal(s.discipline_actions, n, s.key);
+                const summary = await json(client, 'get_student_summary', { student: s.key });
+                assert.equal(summary.discipline_actions.length, n, s.key);
+                for (const a of summary.discipline_actions) {
+                    assert.ok(a.date.replaceAll('-', '') <= today, `action dated ${a.date}`);
+                }
             }
         });
 
@@ -288,6 +308,7 @@ describe('early warning tools', () => {
                 ['find_students', { name: 'a' }],
                 ['list_students_at_risk', { absence_threshold: 0 }],
                 ['list_students_at_risk', { passing_grade: 101 }],
+                ['list_students_at_risk', { discipline_threshold: 0 }],
                 ['get_attendance_trend', { section, weeks: 100 }],
             ];
             for (const [name, args] of cases) {

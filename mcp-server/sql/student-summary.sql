@@ -3,8 +3,8 @@
 -- The Ed-Fi Alliance licenses this file to you under the Apache License, Version 2.0.
 -- See the LICENSE and NOTICES files in the project root for more information.
 
--- One student's attendance so far, grades in the latest grading period, assessment results up to today, and
--- programs. No row when the user may not see the student.
+-- One student's attendance so far, grades in the latest grading period, assessment results and discipline
+-- actions up to today, and programs. No row when the user may not see the student.
 -- $1: user key, $2: student key.
 
 WITH latest_period AS (
@@ -61,6 +61,16 @@ SELECT json_build_object(
         ) t ON true
         WHERE r.studentkey = $2
           AND r.administrationdate <= to_char(current_date, 'YYYYMMDD')),
+    'discipline_actions', (
+        SELECT json_agg(json_build_object('date', a.date, 'action', a.action) ORDER BY a.date DESC)
+        FROM (
+            SELECT DISTINCT to_char(to_date(d.disciplinedatekey, 'YYYYMMDD'), 'YYYY-MM-DD') AS date,
+                   d.disciplineactiondescription AS action,
+                   regexp_replace(d.studentdisciplineactionkey, '-[^-]*$', '') AS action_key
+            FROM analytics.equity_studentdisciplineactiondim d
+            WHERE d.studentkey = $2
+              AND d.disciplinedatekey <= to_char(current_date, 'YYYYMMDD')
+        ) a),
     'programs', (
         SELECT json_agg(DISTINCT p.programname)
         FROM analytics.studentprogramdim p

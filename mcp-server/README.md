@@ -20,8 +20,8 @@ Copilot, are in [TESTING.md](./TESTING.md).
 | `get_my_scope` | What the user may see: schools, sections, number of students |
 | `list_my_sections` | The sections the user teaches |
 | `find_students` | Students by part of the name, section or grade level |
-| `list_students_at_risk` | Students flagged by attendance, grades in the latest grading period or assessment results |
-| `get_student_summary` | One student's attendance, grades, assessments and programs |
+| `list_students_at_risk` | Students flagged by attendance, behavior (discipline actions), grades in the latest grading period or assessment results |
+| `get_student_summary` | One student's attendance, grades, assessments, discipline actions and programs |
 | `get_attendance_trend` | Absences per week for a student or a section |
 
 Every tool is read-only and returns compact JSON with the date and the data

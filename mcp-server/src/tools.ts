@@ -87,34 +87,43 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         title: 'Students at risk',
         description: 'Lists the students the signed-in educator may see who meet at least one early warning '
             + 'indicator: absent from any class on at least absence_threshold percent of instructional days '
-            + 'so far, a grade below passing_grade in the latest grading period, or a Fail or Well Below '
-            + 'Basic assessment result. Sorted by the number of indicators, then by absence rate.',
+            + 'so far, a grade below passing_grade in the latest grading period, a Fail or Well Below Basic '
+            + 'assessment result, or at least discipline_threshold discipline actions (removal from class, '
+            + 'suspension, expulsion) so far. Sorted by the number of indicators, then by absence rate.',
         inputSchema: {
             section: key.optional().describe('Only students in this section (key from list_my_sections)'),
             absence_threshold: z.number().min(1).max(100).optional()
                 .describe('Absence rate that flags attendance, in percent (default 10)'),
             passing_grade: z.number().min(1).max(100).optional()
                 .describe('Numeric grades below this flag course performance (default 70)'),
+            discipline_threshold: z.number().int().min(1).max(50).optional()
+                .describe('Number of discipline actions that flags behavior (default 1)'),
             limit,
         },
         annotations: readOnly,
     }, args => withUser(async user => {
         const absenceThreshold = args.absence_threshold ?? 10;
         const passingGrade = args.passing_grade ?? 70;
+        const disciplineThreshold = args.discipline_threshold ?? 1;
         const { rows, truncated } = await capped('students-at-risk',
-            [user, args.section ?? null, absenceThreshold, passingGrade], args.limit ?? DEFAULT_LIMIT);
+            [user, args.section ?? null, absenceThreshold, passingGrade, disciplineThreshold],
+            args.limit ?? DEFAULT_LIMIT);
         return result({
-            thresholds: { absence_rate: absenceThreshold, passing_grade: passingGrade },
+            thresholds: {
+                absence_rate: absenceThreshold,
+                passing_grade: passingGrade,
+                discipline_actions: disciplineThreshold,
+            },
             students: rows,
             truncated,
         }, ['ews_studentearlywarningfact', 'ews_studentsectiongradefact', 'gradingperioddim',
-            'asmt_studentassessmentfact', 'studentschooldim']);
+            'asmt_studentassessmentfact', 'equity_studentdisciplineactiondim', 'studentschooldim']);
     }));
 
     server.registerTool('get_student_summary', {
         title: 'Student summary',
         description: 'Summarizes one student the signed-in educator may see: attendance so far, grades in '
-            + 'the latest grading period, assessment results and programs.',
+            + 'the latest grading period, assessment results, discipline actions and programs.',
         inputSchema: { student: key.describe('Student key from find_students or list_students_at_risk') },
         annotations: readOnly,
     }, args => withUser(async user => {
@@ -125,7 +134,8 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         }
         return result(row.summary, ['studentschooldim', 'ews_studentearlywarningfact',
             'ews_studentsectiongradefact', 'gradingperioddim', 'studentsectiondim',
-            'asmt_studentassessmentfact', 'asmt_assessmentfact', 'studentprogramdim']);
+            'asmt_studentassessmentfact', 'asmt_assessmentfact', 'equity_studentdisciplineactiondim',
+            'studentprogramdim']);
     }));
 
     server.registerTool('get_attendance_trend', {

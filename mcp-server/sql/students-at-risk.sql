@@ -6,9 +6,10 @@
 -- Students the user may see who meet at least one early warning indicator:
 --   attendance: absent from any class on at least $3 percent of instructional days so far;
 --   course performance: a numeric grade below $4 in the latest grading period that has started;
---   assessments: a Fail or Well Below Basic result up to today.
+--   assessments: a Fail or Well Below Basic result up to today;
+--   behavior: at least $5 discipline actions (removal from class, suspension, expulsion) so far.
 -- $1: user key, $2: section key (optional), $3: absence threshold (percent), $4: passing grade,
--- $5: row limit.
+-- $5: discipline actions, $6: row limit.
 
 WITH students AS (
     SELECT a.studentkey
@@ -49,6 +50,15 @@ assessments AS (
     WHERE r.administrationdate <= to_char(current_date, 'YYYYMMDD')
     GROUP BY r.studentkey
 ),
+discipline AS (
+    -- One row per action and school: count each action once
+    SELECT d.studentkey,
+           count(DISTINCT regexp_replace(d.studentdisciplineactionkey, '-[^-]*$', '')) AS actions
+    FROM analytics.equity_studentdisciplineactiondim d
+    JOIN students USING (studentkey)
+    WHERE d.disciplinedatekey <= to_char(current_date, 'YYYYMMDD')
+    GROUP BY d.studentkey
+),
 flags AS (
     SELECT s.studentkey,
            coalesce(a.days, 0)::int AS days,
@@ -56,11 +66,13 @@ flags AS (
            round(100.0 * a.absent / nullif(a.days, 0), 1)::float8 AS absence_rate,
            coalesce(g.failing, 0)::int AS failing_grades,
            g.grading_period,
-           coalesce(r.low, 0)::int AS low_assessments
+           coalesce(r.low, 0)::int AS low_assessments,
+           coalesce(d.actions, 0)::int AS discipline_actions
     FROM students s
     LEFT JOIN attendance a USING (studentkey)
     LEFT JOIN grades g USING (studentkey)
     LEFT JOIN assessments r USING (studentkey)
+    LEFT JOIN discipline d USING (studentkey)
 )
 SELECT f.studentkey AS key,
        n.name,
@@ -71,9 +83,11 @@ SELECT f.studentkey AS key,
        f.failing_grades,
        f.grading_period,
        f.low_assessments,
+       f.discipline_actions,
        (CASE WHEN f.absence_rate >= $3 THEN 1 ELSE 0 END
         + CASE WHEN f.failing_grades > 0 THEN 1 ELSE 0 END
-        + CASE WHEN f.low_assessments > 0 THEN 1 ELSE 0 END) AS indicators
+        + CASE WHEN f.low_assessments > 0 THEN 1 ELSE 0 END
+        + CASE WHEN f.discipline_actions >= $5 THEN 1 ELSE 0 END) AS indicators
 FROM flags f
 JOIN LATERAL (
     SELECT studentfirstname || ' ' || studentlastname AS name, gradelevel AS grade_level
@@ -81,6 +95,6 @@ JOIN LATERAL (
     WHERE studentkey = f.studentkey
     LIMIT 1
 ) n ON true
-WHERE f.absence_rate >= $3 OR f.failing_grades > 0 OR f.low_assessments > 0
+WHERE f.absence_rate >= $3 OR f.failing_grades > 0 OR f.low_assessments > 0 OR f.discipline_actions >= $5
 ORDER BY indicators DESC, f.absence_rate DESC NULLS LAST, n.name
-LIMIT $5;
+LIMIT $6;
