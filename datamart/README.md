@@ -8,14 +8,14 @@ grades, plus the user-to-student mappings that row-level security needs.
 ## Requirements
 
 - Docker with Docker Compose
-- PowerShell 7
+- Bash, or PowerShell 7
 - About 4 GB of disk space
 
 ## Build
 
-```powershell
-Copy-Item .env.example .env   # then set POSTGRES_PASSWORD in .env
-./build-datamart.ps1
+```bash
+cp .env.example .env   # then set POSTGRES_PASSWORD in .env
+./build-datamart.sh    # or ./build-datamart.ps1
 ```
 
 The first build takes about 15 minutes. It runs every step in a PostgreSQL 16
@@ -33,7 +33,7 @@ container (`docker-compose.yml`, port 5440 by default):
    `edfi_datamart` database, schema `analytics`, and indexes them.
 
 To rebuild only the data mart from the ODS, run
-`./build-datamart.ps1 -RefreshOnly`.
+`./build-datamart.sh --refresh-only` (or `./build-datamart.ps1 -RefreshOnly`).
 
 ## What's in it
 
