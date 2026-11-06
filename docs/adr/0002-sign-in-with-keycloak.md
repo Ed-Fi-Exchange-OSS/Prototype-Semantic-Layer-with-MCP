@@ -45,8 +45,9 @@ Keycloak on its own is enough and that Admin App can be left out.
   with PKCE (S256 required), with the redirect URIs of Claude Code and VS Code.
   A separate `edfi-mcp-tests` client allows the password grant, only for local
   automated tests.
-- **Demo users** for a teacher, a principal and the superintendent are created
-  in Keycloak by a setup step, with a password from `.env`.
+- **Demo users** for a teacher, a principal, an assistant principal, the
+  superintendent and the district administrator are created in Keycloak by a
+  setup step, with a password from `.env`.
 - **Demo user without sign-in** remains for development: when `OAUTH_ISSUER` is
   empty, every request uses `DEMO_USER_EMAIL`, as in phase 1.
 
@@ -80,8 +81,9 @@ another client, without that audience, is rejected.
 - The tools don't change: only how the user is found changed.
 - Anyone who can sign in to the realm with an email that matches a staff email
   gets that staff member's access, so the realm is the place to control users.
-- Staff whose classification has no access scope (assistant principals, the
-  district administrator) can sign in but see no students.
+- Staff whose classification has no access scope mapping can sign in but see
+  no students. The sample data maps teachers, principals, assistant principals,
+  the superintendent and the district administrator.
 - A real deployment would use its own identity provider and trusted
   certificates; the realm, the users and `start-dev` here are for the
   demonstration.
