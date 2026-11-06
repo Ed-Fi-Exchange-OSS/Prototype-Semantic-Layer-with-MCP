@@ -46,6 +46,10 @@ services:
       PGDATABASE: edfi_datamart
       PGUSER: mcp_reader
       PGPASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
+      # Sign-in through Keycloak; set OAUTH_ISSUER to empty in .env to use the demo user instead.
+      OAUTH_ISSUER: ${OAUTH_ISSUER-https://localhost:8443/realms/edfi}
+      OAUTH_JWKS_URL: http://keycloak:8080/realms/edfi/protocol/openid-connect/certs
+      MCP_RESOURCE_URL: https://localhost:${MCP_PORT:-3000}/mcp
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-tina.blevins@RidgemontHighSchool.edu}
       TLS_CERT_FILE: /certs/server.crt
       TLS_KEY_FILE: /certs/server.key
@@ -58,6 +62,8 @@ services:
         condition: service_healthy
       mcp-cert:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_started
 
   # Sign-in for the MCP server: Keycloak with an "edfi" realm like Ed-Fi Admin App's, on
   # https://localhost:8443 (same self-signed certificate). Port 8080 (plain HTTP) is only reachable inside the
