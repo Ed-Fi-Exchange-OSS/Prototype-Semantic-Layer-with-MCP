@@ -17,7 +17,7 @@ tools haven't changed since.
 | Area | What was checked | Result |
 | --- | --- | --- |
 | Automated tests | 24 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling | ✅ 24/24 pass |
-| Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each role; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
+| Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each of 5 roles; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
 | AI assistants | 6 prompts each in Claude Code and GitHub Copilot, in three rounds: 3 a teacher would ask, 3 that try to get data outside the teacher's scope | ✅ 36/36 as expected; no data outside the scope in any answer |
@@ -90,8 +90,10 @@ with the tool tests.
   issued to another client (without this server as audience) each get `401`
   with `error="invalid_token"`.
 - A token presented after it expired gets `401`.
-- The teacher, the principal and the superintendent, each signed in, see their
-  own scope: 716, 3,174 and 21,194 students.
+- The teacher, the principal, the assistant principal, the superintendent and
+  the district administrator, each signed in, see their own scope (sections,
+  school, school, district, district), with as many students as the data mart
+  gives them.
 
 **Containers over HTTPS:** the metadata, the `401` without a token, and a call
 with the principal's token (her school, 3,174 students) worked against the
@@ -232,8 +234,6 @@ district.
 
 - Claude Code's and VS Code's own sign-in: the flow they use was checked with a
   script (section 2), but not by signing in from the assistants themselves.
-- Assistant principals and the LEA administrator: the sample data doesn't map
-  their staff classifications to a scope, so they see no students.
 - Lineage in the results (later phases).
 - Other MCP clients (Claude Desktop, VS Code) beyond the two CLIs above; they
   use the same transport.
