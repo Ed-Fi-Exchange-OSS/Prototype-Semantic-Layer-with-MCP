@@ -25,8 +25,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "sectionIdentifier": "255901002_08-Traditional_WHIST_138_20262027",
         "attendanceEventCategory": "Unexcused Absence"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-ATT-E4581D67"
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1793981760
+        }
+      ]
     },
     {
       "date": "2026-11-05",
@@ -43,8 +47,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "sectionIdentifier": "255901002_08-Traditional_WHIST_138_20262027",
         "attendanceEventCategory": "Unexcused Absence"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-ATT-7B76A16C"
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1793897160
+        }
+      ]
     }
   ],
   "truncated": true,
@@ -52,7 +60,8 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "sources": [
     "lineage.indicator_evidence",
     "lineage.ods_record",
-    "lineage.source_system",
+    "lineage.ods_record_change",
+    "lineage.application",
     "rls_userstudentdataauthorization"
   ]
 }
@@ -80,8 +89,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "gradingPeriodName": "Grading Period A",
         "sectionIdentifier": "255901002_01-Traditional_ART2_103_20262027"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-GRD-878F2963"
+      "_lineage": [
+        {
+          "applicationName": "Northridge Gradebook (fictional sample)",
+          "timestamp": 1791217380
+        }
+      ]
     },
     {
       "date": "2026-10-05",
@@ -99,8 +112,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "gradingPeriodName": "Grading Period A",
         "sectionIdentifier": "255901002_06-Traditional_PE10_124_20262027"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-GRD-5B1C451E"
+      "_lineage": [
+        {
+          "applicationName": "Northridge Gradebook (fictional sample)",
+          "timestamp": 1791211440
+        }
+      ]
     }
   ],
   "truncated": true,
@@ -108,7 +125,8 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "sources": [
     "lineage.indicator_evidence",
     "lineage.ods_record",
-    "lineage.source_system",
+    "lineage.ods_record_change",
+    "lineage.application",
     "rls_userstudentdataauthorization"
   ]
 }
@@ -131,8 +149,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "assessmentIdentifier": "STATE Algebra II",
         "studentAssessmentIdentifier": "STATE Algebra II_2017-08-30"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-ASM-10C4BCA4"
+      "_lineage": [
+        {
+          "applicationName": "State Assessment Vendor (fictional sample)",
+          "timestamp": 1788975120
+        }
+      ]
     }
   ],
   "truncated": false,
@@ -140,7 +162,8 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "sources": [
     "lineage.indicator_evidence",
     "lineage.ods_record",
-    "lineage.source_system",
+    "lineage.ods_record_change",
+    "lineage.application",
     "rls_userstudentdataauthorization"
   ]
 }
@@ -162,8 +185,12 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "studentUniqueId": "004688",
         "disciplineActionIdentifier": "432"
       },
-      "source_system": "Northridge SIS (fictional sample)",
-      "source_record_id": "SAMPLE-DIS-8DA5FE37"
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1787667660
+        }
+      ]
     }
   ],
   "truncated": false,
@@ -171,7 +198,8 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "sources": [
     "lineage.indicator_evidence",
     "lineage.ods_record",
-    "lineage.source_system",
+    "lineage.ods_record_change",
+    "lineage.application",
     "rls_userstudentdataauthorization"
   ]
 }

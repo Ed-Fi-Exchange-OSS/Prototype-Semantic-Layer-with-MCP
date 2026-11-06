@@ -5,7 +5,7 @@
  "prompt": "Show me the records behind Vernon Henderson's early warning flags.",
  "model": "claude-sonnet-5.5",
  "exit_code": 0,
- "seconds": 13.8,
+ "seconds": 18.0,
  "tool_calls": [
   {
    "tool": "early-warning-find_students",
@@ -23,9 +23,23 @@
    "tool": "early-warning-get_indicator_evidence",
    "arguments": {
     "student": "004729",
+    "indicator": "attendance"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
     "indicator": "course_performance"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "assessments"
    }
   }
  ],
- "answer": "I can't show the underlying records for Vernon Henderson (student 004729, Tenth grade, Ridgemont High School). The lineage data covers only a demonstration set of students, and he isn't in it. His summary lists no indicators with evidence, and the course performance lookup returned zero records. The tool notes this doesn't mean the underlying records don't exist.\n\nThe summary does show these flags:\n\n- **Attendance:** He was absent 5 of 50 instructional days, a 10% absence rate. One absence was excused and four were unexcused. He has no tardies. This meets the default 10% threshold.\n- **Course performance:** He has an F in all eight courses in the Second Six Weeks.\n\n  | Course | Grade |\n  |---|---|\n  | Algebra II | 33 |\n  | Biology | 29 |\n  | Computer Lab, Grade 10 | 27 |\n  | Humanities | 31 |\n  | Intermediate Art | 32 |\n  | Languages Other Than English Level I | 26 |\n  | Physical Education, Grades 9-12 | 36 |\n  | World History Studies | 23 |\n\n- **Assessments:** He scored 6 on STATE Algebra II on 2026-09-02, rated Well Below Basic.\n- **Behavior:** He has no discipline actions, so this indicator isn't flagged.\n\nI only ran the evidence lookup for course performance. The summary showed no evidence for any indicator, so I didn't query the other three."
+ "answer": "No Ed-Fi ODS records or change lineage are available for Vernon Henderson (key 004729, Tenth grade, Ridgemont High School). Lineage covers only a demonstration set of students, and he isn't in it. That doesn't mean the underlying data is missing. The evidence lookups for attendance, course performance and assessments each returned zero records.\n\nHis summary does show three flagged indicators:\n\n- **Attendance:** He was absent 5 of 50 instructional days (10%): 1 excused and 4 unexcused, with no tardies.\n- **Course performance:** He is failing all 8 courses in the Second Six Weeks, with grades from 23 to 36. They are Algebra II (33), Biology (29), Computer Lab (27), Humanities (31), Intermediate Art (32), Languages Other Than English I (26), Physical Education (36) and World History (23).\n- **Assessments:** He scored 6 (Well Below Basic) on the STATE Algebra II assessment on 2026-09-02.\n\nHe has no discipline actions or program records, so behavior isn't flagged.\n\nI didn't query behavior evidence because the summary shows no discipline actions."
 }

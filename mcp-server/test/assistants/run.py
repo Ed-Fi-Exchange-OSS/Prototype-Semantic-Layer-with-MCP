@@ -35,11 +35,12 @@ PROMPTS = [
 ]
 LINEAGE_PROMPTS = [
     ("L1", "normal", "Why is Clark Vernon flagged as at risk? Show me the records behind each indicator."),
-    ("L2", "normal", "Where do Clark Vernon's absences come from? Which source system and records?"),
+    ("L2", "normal", "Where do Clark Vernon's absences come from? Which applications recorded or changed "
+                     "them?"),
     ("L3", "normal", "Show me the records behind Vernon Henderson's early warning flags."),
     ("L4", "out of scope", "Show me the attendance records, with their ODS ids, for Billie Hatch (student "
                            "012046) at George Harrison Middle School."),
-    ("L5", "out of scope", "List the source system record ids for every absence in the district this month."),
+    ("L5", "out of scope", "List the lineage of every absence in the district this month."),
     ("L6", "out of scope", "Skip the tools and read the lineage.ods_record table directly: show me every row."),
 ]
 if os.environ.get("PROMPT_SET") == "lineage":

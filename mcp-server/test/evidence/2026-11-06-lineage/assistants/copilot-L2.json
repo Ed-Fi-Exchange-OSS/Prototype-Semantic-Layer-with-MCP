@@ -2,10 +2,10 @@
  "assistant": "copilot",
  "id": "L2",
  "kind": "normal",
- "prompt": "Where do Clark Vernon's absences come from? Which source system and records?",
+ "prompt": "Where do Clark Vernon's absences come from? Which applications recorded or changed them?",
  "model": "claude-sonnet-5.5",
  "exit_code": 0,
- "seconds": 28.9,
+ "seconds": 33.2,
  "tool_calls": [
   {
    "tool": "early-warning-find_students",
@@ -24,71 +24,71 @@
   {
    "tool": "powershell",
    "arguments": {
-    "command": "$j=Get-Content 'C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt' -Raw | ConvertFrom-Json; $j.PSObject.Properties.Name -join ','; $j.records[0] | ConvertTo-Json -Depth 6; $j.records | group {$_.source_system} | select Name,Count; $j.records | group ods_resource | select Name,Count",
-    "description": "Summarize attendance evidence"
+    "command": "$j=Get-Content 'C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt' -Raw|ConvertFrom-Json\n$j.records[0]|ConvertTo-Json -Depth 8\n$j.records|%{$_.ods_resource}|group|select Name,Count|ft\n$j.records|%{ $r=$_; $r._lineage|%{ \"$($_.application) | $($_.change)|$($_.action)\" } }|group|select Name,Count|ft -auto"
    }
   },
   {
    "tool": "grep",
    "arguments": {
-    "pattern": "\"source[^\"]*\":\"[^\"]*\"",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
+    "pattern": "\"_lineage\"",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
     "output_mode": "count"
    }
   },
   {
    "tool": "view",
    "arguments": {
-    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
+    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
     "view_range": [
      1,
-     3
-    ]
-   }
-  },
-  {
-   "tool": "view",
-   "arguments": {
-    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
-    "view_range": [
-     1,
-     60
+     40
     ]
    }
   },
   {
    "tool": "grep",
    "arguments": {
-    "pattern": "source|lineage",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
-    "output_mode": "count"
-   }
-  },
-  {
-   "tool": "grep",
-   "arguments": {
     "output_mode": "count",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
-    "pattern": "\"source_system\": \"Northridge SIS \\(fictional sample\\)\""
-   }
-  },
-  {
-   "tool": "grep",
-   "arguments": {
-    "output_mode": "count",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
-    "pattern": "\"ods_resource\": \"studentSectionAttendanceEvents\""
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
+    "pattern": "\"applicationName\": \"Northridge SIS \\(fictional sample\\)\""
    }
   },
   {
    "tool": "grep",
    "arguments": {
     "output_mode": "content",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt",
-    "pattern": "truncated|\"localCourseCode\"",
-    "head_limit": 3
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
+    "pattern": "\"applicationName\": \"(?!Northridge SIS)",
+    "-B": 3,
+    "-A": 3
+   }
+  },
+  {
+   "tool": "grep",
+   "arguments": {
+    "output_mode": "count",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
+    "pattern": "\"applicationName\""
+   }
+  },
+  {
+   "tool": "grep",
+   "arguments": {
+    "output_mode": "count",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
+    "pattern": "\"ods_resource\": \"studentSectionAttendanceEvents\""
+   }
+  },
+  {
+   "tool": "grep",
+   "arguments": {
+    "-B": 4,
+    "-A": 3,
+    "output_mode": "content",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000015667-copilot-tool-output-9fb3744ca1854755b87106d86228e6d3.txt",
+    "pattern": "\"applicationName\": \"[^N]"
    }
   }
  ],
- "answer": "Clark Vernon (student 004688, Tenth grade, Ridgemont High School) has 51 absence records, covering 44 different days.\n\n- **Source system:** All 51 records come from \"Northridge SIS (fictional sample)\". The tool labels this system as a fictional demonstration source.\n- **Ed-Fi ODS resource:** All 51 are `studentSectionAttendanceEvents`, one per class missed.\n- **Source record IDs:** They use the form `SAMPLE-ATT-xxxxxxxx`. Each is paired with an ODS id (a GUID).\n- **Most recent records:**\n\n| Date | Category | Course | Source record ID | ODS id |\n|---|---|---|---|---|\n| 2026-11-06 | Unexcused Absence | W-HIST | SAMPLE-ATT-E4581D67 | 85be1301-13ab-47d8-8623-89efb2250c5b |\n| 2026-11-05 | Unexcused Absence | W-HIST | SAMPLE-ATT-7B76A16C | fff4ecf1-4c91-4923-892b-a4ec49cb02f4 |\n| 2026-11-04 | Unexcused Absence | W-HIST | SAMPLE-ATT-BD621B26 | 86831056-ca5e-4b67-93df-3735f17b78ba |\n\n- **Section:** The recent records are in section `255901002_08-Traditional_WHIST_138_20262027`, in the 2026\u20132027 Fall Semester. I only read the first three records in full, so I haven't confirmed which other sections the remaining 48 fall in.\n\nThe full list of 51 records is saved at `C:\\Users\\progr\\AppData\\Local\\Temp\\1793988213246-copilot-tool-output-8f73bd4739a146d4ba7179219b3d8010.txt`."
+ "answer": "Clark Vernon (student 004688, Tenth grade, Ridgemont High School) has 51 class-level absence records across 44 distinct days. Every record is a `studentSectionAttendanceEvents` resource in the Ed-Fi ODS, and each one has lineage.\n\n**Who recorded them**\n- **Northridge SIS (fictional sample)** created all 51 records. It is the origin of every absence. The most recent one is an Unexcused Absence in W-HIST on 2026-11-06.\n\n**Who changed them**\n- **Ridgemont Attendance Office (fictional sample)** made a later change to 8 of the 51 records. Each change came about a day after Northridge SIS created the record, in late October 2026.\n- The lineage shows who changed those records and when, but not which field was edited. I didn't compare before and after values.\n- The other 43 records were not changed after creation.\n\nI counted the records and their lineage entries by searching the saved output. I did not look up the event dates of the 8 changed records, so I can't say which specific days they cover."
 }

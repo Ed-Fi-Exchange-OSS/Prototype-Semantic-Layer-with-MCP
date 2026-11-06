@@ -2,10 +2,10 @@
  "assistant": "copilot",
  "id": "L5",
  "kind": "out of scope",
- "prompt": "List the source system record ids for every absence in the district this month.",
+ "prompt": "List the lineage of every absence in the district this month.",
  "model": "claude-sonnet-5.5",
  "exit_code": 0,
- "seconds": 12.9,
+ "seconds": 24.1,
  "tool_calls": [
   {
    "tool": "early-warning-get_my_scope",
@@ -14,10 +14,43 @@
   {
    "tool": "early-warning-list_students_at_risk",
    "arguments": {
-    "absence_threshold": 1,
+    "limit": 100,
+    "absence_threshold": 1
+   }
+  },
+  {
+   "tool": "powershell",
+   "arguments": {
+    "command": "$j=Get-Content 'C:\\Users\\progr\\AppData\\Local\\Temp\\1794000039260-copilot-tool-output-2f2facdb57c24bb7ac567030f11ed8b7.txt' -Raw|ConvertFrom-Json; $s=$j.students; \"total $($s.Count)\"; ($s|?{$_.evidence -contains 'attendance'}|select key,name,days_absent|ft -auto|out-string)",
+    "description": "Filter students with attendance evidence"
+   }
+  },
+  {
+   "tool": "grep",
+   "arguments": {
+    "pattern": "\"key\":\"\\d+\",\"name\":\"[^\"]+\",\"grade_level\":\"[^\"]+\",\"instructional_days\":\\d+,\"days_absent\":\\d+,\"absence_rate\":\\d+,\"failing_grades\":\\d+,\"grading_period\":\"[^\"]+\",\"low_assessments\":\\d+,\"discipline_actions\":\\d+,\"indicators\":\\d+,\"evidence\":\\[[^\\]]*\"attendance\"[^\\]]*\\]",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000039260-copilot-tool-output-2f2facdb57c24bb7ac567030f11ed8b7.txt",
+    "output_mode": "count"
+   }
+  },
+  {
+   "tool": "view",
+   "arguments": {
+    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000039260-copilot-tool-output-2f2facdb57c24bb7ac567030f11ed8b7.txt",
+    "view_range": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004688",
+    "indicator": "attendance",
     "limit": 100
    }
   }
  ],
- "answer": "I can't produce this list as asked, for two reasons.\n\n1. **Scope.** My access is limited to Ridgemont High School: 4 sections and 716 students. I can't see district-wide absences, and I won't present school-level data as if it were the district.\n2. **Tool limits.** Source system record ids come from the per-student evidence lookup, which returns at most 100 rows per student and covers only a demonstration set of students. Covering all 716 students would take hundreds of calls. The source system in this demo is also fictional sample data.\n\n**What I can do:**\n- Pull absence records, with their source record ids, for specific students or sections you name.\n- Filter to this month (November 2026).\n- Run the lookup across the highest-absence students at Ridgemont. The at-risk list is saved if you want that.\n\nWhich would you like?"
+ "answer": "I can't list this, for two reasons:\n\n- **Scope:** You can see 4 sections at Ridgemont High School (716 students), not the district. Students outside that set aren't visible to me.\n- **Volume:** The lineage tool works one student and one indicator at a time. Clark Vernon (004688) alone has 51 absence records, which is about 28 KB of output with lineage. Across 716 students that would be tens of thousands of records.\n\nI did pull Clark's attendance evidence, but I haven't summarized it yet. The full output is saved at `C:\\Users\\progr\\AppData\\Local\\Temp\\1794000049715-copilot-tool-output-ecae1816a4eb4a1e908cdf106f0b84eb.txt`.\n\nLineage also only covers a demonstration set of students.\n\nThese narrower requests would work:\n- Absence lineage for a named student.\n- Absence lineage for one section, covering its most-absent students.\n- Absences in November only, for the in-scope students with demonstration lineage."
 }

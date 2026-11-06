@@ -145,12 +145,13 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         title: 'Indicator evidence',
         description: 'Shows the records behind one early warning indicator for one student the signed-in '
             + 'educator may see: the absences, the grades below passing, the low assessment results or the '
-            + 'discipline actions, each with its Ed-Fi ODS resource and id, and the source system and its '
-            + 'record id when known. Attendance has one record per class missed: "days" is the number of '
-            + 'different days, the same as days_absent (days absent from at least one class). Lineage covers '
-            + 'a demonstration set of students; the "evidence" field of '
-            + 'list_students_at_risk and get_student_summary says which indicators have records. The source '
-            + 'system in the demonstration is a fictional sample.',
+            + 'discipline actions, each with its Ed-Fi ODS resource and id, and "_lineage": every change to '
+            + 'the record, oldest first, with the application that made it and the time (Unix seconds), as '
+            + 'in the Ed-Fi lineage proposal. Attendance has one record per class missed: "days" is the '
+            + 'number of different days, the same as days_absent (days absent from at least one class). '
+            + 'Lineage covers a demonstration set of students; the "evidence" field of '
+            + 'list_students_at_risk and get_student_summary says which indicators have records. The '
+            + 'applications and their changes in the demonstration are fictional samples.',
         inputSchema: {
             student: key.describe('Student key from find_students or list_students_at_risk'),
             indicator: z.enum(['attendance', 'course_performance', 'assessments', 'behavior'])
@@ -177,7 +178,7 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
                 note: 'No lineage records for this student and indicator. Lineage covers a demonstration '
                     + 'set of students only, so this does not mean the indicator has no underlying records.',
             }),
-        }, ['lineage.indicator_evidence', 'lineage.ods_record', 'lineage.source_system',
+        }, ['lineage.indicator_evidence', 'lineage.ods_record', 'lineage.ods_record_change', 'lineage.application',
             'rls_userstudentdataauthorization']);
     }));
 

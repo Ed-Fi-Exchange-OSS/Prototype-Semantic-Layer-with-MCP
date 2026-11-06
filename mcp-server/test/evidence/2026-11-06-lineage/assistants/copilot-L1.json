@@ -5,7 +5,7 @@
  "prompt": "Why is Clark Vernon flagged as at risk? Show me the records behind each indicator.",
  "model": "claude-sonnet-5.5",
  "exit_code": 0,
- "seconds": 31.6,
+ "seconds": 33.8,
  "tool_calls": [
   {
    "tool": "early-warning-find_students",
@@ -51,7 +51,7 @@
   {
    "tool": "powershell",
    "arguments": {
-    "command": "$j=Get-Content 'C:\\Users\\progr\\AppData\\Local\\Temp\\1793988215111-copilot-tool-output-ac244151719242b1bdf72229e1277722.txt' -Raw|ConvertFrom-Json; $j.records|Group-Object ods_resource|%{\"$($_.Name): $($_.Count)\"}; ($j.records|%{$_.summary.Split(',')[0]}|Group-Object|%{\"$($_.Name): $($_.Count)\"}); ($j.records|%{$_.date}|sort)[0,-1]; $j.records[0]|ConvertTo-Json -Depth 4; $j.records.source_system|sort -Unique",
+    "command": "$j=Get-Content 'C:\\Users\\progr\\AppData\\Local\\Temp\\1794000017704-copilot-tool-output-fae1325d5b394e8ca42528cf9af39265.txt' -Raw|ConvertFrom-Json; $j.records|Group-Object {$_.summary.Split(',')[0]}|%{\"$($_.Name): $($_.Count)\"}; ($j.records|%{$_.ods_resource}|sort -u); $j.records|%{$_._lineage.applicationName}|group|%{\"$($_.Name): $($_.Count)\"}; $j.records|select -first 2 -last 1|%{\"$($_.date) $($_.summary) $($_.ods_id)\"}; $j.records|%{$_.date}|sort|select -first 1; $j.truncated",
     "description": "Summarize attendance records"
    }
   },
@@ -59,29 +59,37 @@
    "tool": "grep",
    "arguments": {
     "pattern": "\"summary\":\"[^\"]*\"",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988215111-copilot-tool-output-ac244151719242b1bdf72229e1277722.txt",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000017704-copilot-tool-output-fae1325d5b394e8ca42528cf9af39265.txt",
+    "output_mode": "count"
+   }
+  },
+  {
+   "tool": "grep",
+   "arguments": {
+    "pattern": "\"applicationName\":\"[^\"]*\"",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000017704-copilot-tool-output-fae1325d5b394e8ca42528cf9af39265.txt",
     "output_mode": "count"
    }
   },
   {
    "tool": "view",
    "arguments": {
-    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988215111-copilot-tool-output-ac244151719242b1bdf72229e1277722.txt",
+    "path": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000017704-copilot-tool-output-fae1325d5b394e8ca42528cf9af39265.txt",
     "view_range": [
      1,
-     1
+     3
     ]
    }
   },
   {
    "tool": "grep",
    "arguments": {
+    "pattern": "\"summary\"|\"applicationName\"|\"truncated\"",
+    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1794000017704-copilot-tool-output-fae1325d5b394e8ca42528cf9af39265.txt",
     "output_mode": "content",
-    "paths": "C:\\Users\\progr\\AppData\\Local\\Temp\\1793988215111-copilot-tool-output-ac244151719242b1bdf72229e1277722.txt",
-    "pattern": "\"(date|summary)\":",
-    "head_limit": 110
+    "head_limit": 120
    }
   }
  ],
- "answer": "Clark Vernon (Tenth grade, Ridgemont High School, key 004688) meets all four early-warning indicators, as of 2026-11-06. Every record comes from \"Northridge SIS (fictional sample)\" and carries an Ed-Fi ODS resource and ID.\n\n**1. Attendance: 44 of 50 instructional days absent (88%)**\n- There are 51 class-level absence records. 43 days are unexcused and 1 is excused. There are no tardies.\n- The records run daily from 2026-08-25 to 2026-11-06 (`studentSectionAttendanceEvents`). Almost all are \"Unexcused Absence\" in World History (W-HIST).\n- The one excused day is 2026-10-23, with 7 class records (SPAN-1, W-HIST, PE-10, BIO, ART-2, CL-10, ENG-2, HUMT).\n\n**2. Course performance: failing all 8 courses**\nThese are `grades` records, dated 2026-10-05.\n\n| Course | Grade | Source record |\n|---|---|---|\n| Biology | 44 | SAMPLE-GRD-95448009 |\n| Computer Lab | 46 | SAMPLE-GRD-5FA57D17 |\n| English II | 44 | SAMPLE-GRD-3FBDFC6F |\n| Humanities | 35 | SAMPLE-GRD-50306B0A |\n| Intermediate Art | 49 | SAMPLE-GRD-878F2963 |\n| Languages Other Than English I | 43 | SAMPLE-GRD-401B4620 |\n| PE | 42 | SAMPLE-GRD-5B1C451E |\n| World History | 46 | SAMPLE-GRD-125CC82C |\n\n**3. Assessments: Well Below Basic**\n- STATE Algebra II, 2026-09-02 (`studentAssessments`, ODS id 2df40df6-a5a6-4277-b63f-3ab6cc58a2ac, source SAMPLE-ASM-10C4BCA4).\n\n**4. Behavior: 1 discipline action**\n- In School Suspension on 2026-08-25 (`disciplineActions`, ODS id 4ca234bb-f8ae-42d0-bc72-e3042794043e, source SAMPLE-DIS-8DA5FE37).\n\nTwo inconsistencies in the data:\n- The student summary labels the grades \"Second Six Weeks\", but the evidence records say \"Grading Period A\".\n- The assessment's natural key contains \"2017-08-30\", while the record date is 2026-09-02."
+ "answer": "Clark Vernon (key 004688, 10th grade, Ridgemont High) meets all four early-warning indicators, as of 2026-11-06.\n\n**1. Attendance: 44 of 50 instructional days absent (88%)**\n- There are 51 `studentSectionAttendanceEvents` records. The only class he misses on most days is World History (`W-HIST`).\n- 43 are Unexcused Absences in World History, one per day, the latest on 2026-11-06.\n- 8 are Excused Absences, one for each class (SPAN-1, W-HIST, PE-10, BIO, ART-2, CL-10, ENG-2, HUMT), all on a single day.\n- Each record came from Northridge SIS. The 8 excused records were later changed by the Ridgemont Attendance Office.\n- The Ed-Fi ODS record IDs are in the tool output. I haven't listed them here.\n\n**2. Course performance: failing all 8 courses (Second Six Weeks, dated 2026-10-05)**\nThese are `grades` records, all from Northridge Gradebook.\n\n| Course | Grade |\n|---|---|\n| Biology | 44 |\n| Computer Lab | 46 |\n| English II | 44 |\n| Humanities | 35 |\n| Intermediate Art | 49 |\n| Languages Other Than English I (Spanish) | 43 |\n| Physical Education | 42 |\n| World History | 46 |\n\n**3. Assessments: Well Below Basic on STATE Algebra II (2026-09-02)**\nThis is a `studentAssessments` record, ID `2df40df6-a5a6-4277-b63f-3ab6cc58a2ac`, from the State Assessment Vendor.\n\n**4. Behavior: one In School Suspension (2026-08-25)**\nThis is `disciplineActions` record 432, ID `4ca234bb-f8ae-42d0-bc72-e3042794043e`, from Northridge SIS.\n\nThe attendance and grade pattern is extreme enough that it may be worth checking whether the records are correct. The applications named above are fictional samples in the demonstration data."
 }

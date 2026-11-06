@@ -4,7 +4,8 @@
 -- See the LICENSE and NOTICES files in the project root for more information.
 
 -- The lineage records behind one early warning indicator for one student (docs/adr/0003): the ODS records
--- and, where known, their source system. Newest first. No row when the user may not see the student.
+-- and the history of changes to each one, as `_lineage` in option 2 of the Ed-Fi lineage proposal (application
+-- name and Unix time of every modification, oldest first). Newest records first. No row when the user may not see the student.
 -- $1: user key, $2: student key, $3: indicator, $4: row limit.
 
 SELECT json_build_object(
@@ -24,11 +25,15 @@ SELECT json_build_object(
                    o.ods_resource,
                    o.ods_id,
                    o.natural_key,
-                   s.name AS source_system,
-                   o.source_record_id
+                   coalesce((
+                       SELECT json_agg(json_build_object('applicationName', a.name,
+                                                         'timestamp', extract(epoch FROM c.modified_at)::bigint)
+                                       ORDER BY c.modified_at)
+                       FROM lineage.ods_record_change c
+                       JOIN lineage.application a ON a.application_id = c.application_id
+                       WHERE c.ods_resource = o.ods_resource AND c.ods_id = o.ods_id), '[]'::json) AS "_lineage"
             FROM lineage.indicator_evidence e
             JOIN lineage.ods_record o ON o.ods_resource = e.ods_resource AND o.ods_id = e.ods_id
-            LEFT JOIN lineage.source_system s ON s.source_system_id = o.source_system_id
             WHERE e.student_key = $2 AND e.indicator = $3
             ORDER BY o.event_date DESC NULLS LAST, o.ods_id
             LIMIT $4
