@@ -8,8 +8,9 @@
 #   1. Downloads the Northridge sample ODS (ODS/API 7.3, Data Standard 5.2) and restores it.
 #   2. Moves its dates to the current school year (sql/time-travel.sql).
 #   3. Installs the analytics views (sql/views) and their Northridge configuration (sql/descriptor-map.sql).
-#   4. Builds the data mart database, with the views materialized into tables (sql/datamart.sql), and the
-#      read-only role the MCP server uses (sql/mcp-reader.sql).
+#   4. Builds the data mart database, with the views materialized into tables (sql/datamart.sql), the
+#      lineage tables with a demonstration set (sql/lineage.sql, sql/lineage-demo.sql), and the read-only
+#      role the MCP server uses (sql/mcp-reader.sql).
 #
 # Usage: ./build-datamart.sh [--refresh-only]
 #   --refresh-only  only rebuilds the data mart from the ODS (step 4)
@@ -81,6 +82,7 @@ db "psql -U postgres -tc \"SELECT 1 FROM pg_database WHERE datname = '$datamart_
 # The password comes from the container's environment, so it never appears in a command line here.
 db "psql -U postgres -d $datamart_db -q -v ods_db=$ods_db -v ods_user=postgres \
     -v ods_password=\"\$POSTGRES_PASSWORD\" -f /sql/datamart.sql"
+db "psql -U postgres -d $datamart_db -q -v ON_ERROR_STOP=1 -f /sql/lineage.sql -f /sql/lineage-demo.sql"
 db "psql -U postgres -d $datamart_db -q -v ON_ERROR_STOP=1 \
     -v reader_password=\"\$MCP_READER_PASSWORD\" -f /sql/mcp-reader.sql"
 

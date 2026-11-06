@@ -1,0 +1,45 @@
+{
+ "assistant": "copilot",
+ "id": "L3",
+ "kind": "normal",
+ "prompt": "Show me the records behind Vernon Henderson's early warning flags.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 18.0,
+ "tool_calls": [
+  {
+   "tool": "early-warning-find_students",
+   "arguments": {
+    "name": "Vernon Henderson"
+   }
+  },
+  {
+   "tool": "early-warning-get_student_summary",
+   "arguments": {
+    "student": "004729"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "attendance"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "course_performance"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "assessments"
+   }
+  }
+ ],
+ "answer": "No Ed-Fi ODS records or change lineage are available for Vernon Henderson (key 004729, Tenth grade, Ridgemont High School). Lineage covers only a demonstration set of students, and he isn't in it. That doesn't mean the underlying data is missing. The evidence lookups for attendance, course performance and assessments each returned zero records.\n\nHis summary does show three flagged indicators:\n\n- **Attendance:** He was absent 5 of 50 instructional days (10%): 1 excused and 4 unexcused, with no tardies.\n- **Course performance:** He is failing all 8 courses in the Second Six Weeks, with grades from 23 to 36. They are Algebra II (33), Biology (29), Computer Lab (27), Humanities (31), Intermediate Art (32), Languages Other Than English I (26), Physical Education (36) and World History (23).\n- **Assessments:** He scored 6 (Well Below Basic) on the STATE Algebra II assessment on 2026-09-02.\n\nHe has no discipline actions or program records, so behavior isn't flagged.\n\nI didn't query behavior evidence because the summary shows no discipline actions."
+}
