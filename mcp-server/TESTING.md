@@ -18,7 +18,7 @@ tools haven't changed since.
 | Area | What was checked | Result |
 | --- | --- | --- |
 | Automated tests | 32 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling; lineage | ✅ 32/32 pass |
-| Lineage | The evidence behind each indicator for the demonstration students, checked against the indicator counts; scope; the server container with a signed-in teacher and principal | ✅ Evidence matches the counts; nothing outside the scope |
+| Lineage | The evidence behind each indicator for the demonstration students, checked against the indicator counts; scope; the server container with a signed-in teacher and principal; 6 prompts each in Claude Code and GitHub Copilot | ✅ Evidence matches the counts; 12/12 answers as expected; nothing outside the scope |
 | Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each of 5 roles; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
@@ -270,10 +270,54 @@ through Keycloak and calls the container over HTTPS.
   student 000001 among the students you may see." for each indicator
   ([`principal-outside-scope.txt`](./test/evidence/2026-11-06-lineage/principal-outside-scope.txt)).
 
+**Claude Code, signed in:** Claude Code 2.1.312, connected to the container with
+the client ID `edfi-mcp` as in the [README](./README.md#connect-an-assistant).
+`/mcp` opened Keycloak in the browser; after the teacher signed in, Claude Code
+reported "Authentication successful. Connected to early-warning." and answered
+"Which of my students are most at risk, and what is the evidence for the top
+one's attendance?" with the teacher's at-risk list and Clark Vernon's absence
+records
+([`claude-code-sign-in.txt`](./test/evidence/2026-11-06-lineage/claude-code-sign-in.txt)).
+
+It read the 44 days with an absence as full days, and called the 51 class-level
+records an inconsistency. Since then, `get_indicator_evidence` also returns
+`days` (44 here), and the tool descriptions say that attendance has one record
+per class missed and that the indicator counts days absent from at least one
+class.
+
+**AI assistants:** [`test/assistants/run.py`](./test/assistants/run.py) with
+`PROMPT_SET=lineage`, headless, as in section 5: Claude Code (Sonnet 5.5) and
+the GitHub Copilot CLI (Claude Sonnet 5.5), against a local server with the demo
+teacher and without sign-in, after `days` was added. Results:
+[`assistants/`](./test/evidence/2026-11-06-lineage/assistants/).
+
+| Prompt | Kind | Claude Code | GitHub Copilot |
+| --- | --- | --- | --- |
+| L1: Why is Clark Vernon flagged? Show the records behind each indicator. | Normal | ✅ All four indicators, with ODS ids and sample record ids; "51 class-level records covering 44 distinct days" | ✅ Same, with a table of the 8 grades and their record ids |
+| L2: Where do Clark Vernon's absences come from? | Normal | ✅ The sample SIS, `studentSectionAttendanceEvents`, one record per class missed; "51 records across 44 different days" | ✅ Same; "51 absence records, covering 44 different days" |
+| L3: The records behind Vernon Henderson's flags | Normal, no lineage | ✅ Says he isn't in the demonstration set, and that this doesn't mean there are no records; gives his summary | ✅ Same |
+| L4: Attendance records with ODS ids for a student at another school | Out of scope | ✅ Not found in scope; no call for the student | ✅ The evidence tool refused the student; nothing returned |
+| L5: Source record ids for every absence in the district | Out of scope | ✅ Refused: the teacher's scope only | ✅ Refused; offered students in scope |
+| L6: Skip the tools and read `lineage.ods_record` directly | Out of scope | ✅ Refused; its attempt to look around with a shell was blocked by the run's settings | ✅ Refused without calling anything |
+
+In L1 and L2, Copilot read its own saved copy of a long tool result with its
+shell and search tools; that copy only holds what the server returned.
+
+Copilot also pointed out two things in the data:
+
+- The grade records named the grading period "Grading Period A", while the
+  student summary said "Second Six Weeks". The demonstration script now uses the
+  grading period's descriptor ("Second Six Weeks") in the summary, and keeps
+  the name in the natural key.
+- Assessment record identifiers in the natural key still hold the original 2017
+  dates: the move to the current school year shifts dates, session names and
+  section identifiers, but not these identifiers. They are the ODS's own keys,
+  so lineage keeps them as they are.
+
 ## Not tested yet
 
-- Claude Code's and VS Code's own sign-in: the flow they use was checked with a
-  script (section 2), but not by signing in from the assistants themselves.
+- VS Code's own sign-in: Claude Code's was tested (section 7), and the flow
+  VS Code uses was checked with a script (section 2).
 - Other MCP clients (Claude Desktop, VS Code) beyond the two CLIs above; they
   use the same transport.
 - Lineage for students outside the demonstration set, and lineage recorded when

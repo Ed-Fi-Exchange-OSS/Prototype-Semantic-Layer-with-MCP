@@ -1,0 +1,60 @@
+{
+ "assistant": "claude",
+ "id": "L1",
+ "kind": "normal",
+ "prompt": "Why is Clark Vernon flagged as at risk? Show me the records behind each indicator.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 17.2,
+ "tool_calls": [
+  {
+   "tool": "ToolSearch",
+   "arguments": {
+    "query": "select:mcp__early-warning__find_students,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_student_summary",
+    "max_results": 5
+   }
+  },
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004688",
+    "indicator": "attendance",
+    "limit": 100
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004688",
+    "indicator": "course_performance"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004688",
+    "indicator": "assessments"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004688",
+    "indicator": "behavior"
+   }
+  }
+ ],
+ "answer": "Clark Vernon (Tenth grade, Ridgemont High School, key 004688) is flagged on all four indicators. All records below come from the Ed-Fi ODS. The source system is \"Northridge SIS (fictional sample)\", a demonstration dataset.\n\n## 1. Attendance: 44 of 50 instructional days absent (88%)\nThere are 51 class-level records covering 44 distinct days. 43 days are unexcused and 1 is excused. No tardies.\n\n- **Resource:** `studentSectionAttendanceEvents`\n- **Pattern:** Almost every record is an Unexcused Absence in World History (W-HIST). He missed that class on 43 days, from 2026-08-25 through 2026-11-06, and every school day in the last two weeks is on the list (10/26\u201311/06).\n- **Excused day:** On 2026-10-23 he has 8 excused absences, one in each of his 8 classes. That is a single full-day absence.\n- **Examples:**\n  - 2026-11-06, W-HIST: ods_id `85be1301-13ab-47d8-8623-89efb2250c5b`, source record `SAMPLE-ATT-E4581D67`\n  - 2026-08-25, W-HIST: ods_id `fae6823d-36ef-44da-9184-0a214e6b9435`, source record `SAMPLE-ATT-C8B729FD`\n\n## 2. Course performance: failing all 8 courses\nThese are `grades` records for Grading Period A, all dated 2026-10-05. The summary calls the same period \"Second Six Weeks\".\n\n| Course | Grade | Source record |\n|---|---|---|\n| Humanities (HUMT) | 35 F | SAMPLE-GRD-50306B0A |\n| Physical Education (PE-10) | 42 F | SAMPLE-GRD-5B1C451E |\n| Spanish I (SPAN-1) | 43 F | SAMPLE-GRD-401B4620 |\n| English II (ENG-2) | 44 F | SAMPLE-GRD-3FBDFC6F |\n| Biology (BIO) | 44 F | SAMPLE-GRD-95448009 |\n| Computer Lab (CL-10) | 46 F | SAMPLE-GRD-5FA57D17 |\n| World History (W-HIST) | 46 F | SAMPLE-GRD-125CC82C |\n| Intermediate Art (ART-2) | 49 F | SAMPLE-GRD-878F2963 |\n\n## 3. Assessments: 1 low result\n- STATE Algebra II, 2026-09-02, **Well Below Basic** (score 8).\n- Resource: `studentAssessments`, ods_id `2df40df6-a5a6-4277-b63f-3ab6cc58a2ac`, source record `SAMPLE-ASM-10C4BCA4`.\n- The assessment identifier is `STATE Algebra II_2017-08-30`. That date is 2017, not 2026, which looks odd in the sample data.\n\n## 4. Behavior: 1 discipline action\n- In School Suspension on 2026-08-25.\n- Resource: `disciplineActions`, ods_id `4ca234bb-f8ae-42d0-bc72-e3042794043e`, source record `SAMPLE-DIS-8DA5FE37`.\n- This is the same date as his first unexcused W-HIST absence, so the two may be related. The records don't link them.\n\n## Takeaway\nHis attendance has been poor since the start of the year, and almost all of it is skipping one class (World History). He is failing every course. The failing grades are low across the board, between 35 and 49, so they are not limited to World History. Calling about the 43 unexcused W-HIST absences looks like the most useful first step.\n\nThe tool also returns each record's full Ed-Fi natural key (section identifiers and so on) if you need it."
+}
