@@ -17,6 +17,21 @@ can report them (FR-LINEAGE-2). API-native lineage is planned for Ed-Fi API 8;
 until then the proof of concept keeps lineage in "sidecar" tables next to the
 data mart, populated by hand at first.
 
+The Ed-Fi API lineage proposal,
+[Tracking Lineage](https://github.com/Ed-Fi-Alliance-OSS/Ed-Fi-Technology-Roadmap/issues/20),
+weighs three options. This design follows option 2, "Last Modified (History)":
+each record reports the application and the time of every modification, as a
+`_lineage` list:
+
+```javascript
+{
+  "_lineage": [
+    { "applicationName": "Example SIS", "timestamp": 1711761837 },
+    { "applicationName": "Example HR System", "timestamp": 1723054999 }
+  ]
+}
+```
+
 What the data offers:
 
 - Every ODS resource has a stable `id`, the same one the Ed-Fi API exposes, and
@@ -25,8 +40,9 @@ What the data offers:
 - The data mart's facts are aggregates: a row of `ews_studentearlywarningfact` is
   one student, school and day, built from several attendance events. The facts
   don't carry ODS `id`s.
-- The ODS doesn't record which source system or record a resource came from;
-  that has to be supplied.
+- The ODS doesn't record which application created or changed a resource; that
+  has to be supplied. Northridge is sample data, so the applications are
+  fictional, and will stay so: the proof of concept won't use real data.
 
 This ADR records the design (DEVOPS-186). Reporting lineage through the tools is
 the next phase (DEVOPS-187).
@@ -39,13 +55,14 @@ The tables live in a `lineage` schema in the data mart database. The data mart
 build replaces only the `analytics` schema, so lineage records survive a
 refresh. The MCP server's role can read them.
 
-### Three tables
+### Four tables
 
 ```sql
--- Systems that send data to the ODS (for the demo, a fictional SIS)
-CREATE TABLE lineage.source_system (
-    source_system_id   text PRIMARY KEY,         -- e.g. 'northridge-sis'
-    name               text NOT NULL,            -- e.g. 'Northridge SIS (sample)'
+-- Applications that write to the ODS: the API client's application name
+-- (for the demo, fictional applications)
+CREATE TABLE lineage.application (
+    application_id     text PRIMARY KEY,         -- e.g. 'northridge-sis-sample'
+    name               text NOT NULL,            -- e.g. 'Northridge SIS (fictional sample)'
     description        text
 );
 
@@ -57,10 +74,18 @@ CREATE TABLE lineage.ods_record (
     student_key        text NOT NULL,            -- studentUniqueId, for scope checks
     event_date         date,                     -- when it happened, if it has a date
     summary            text NOT NULL,            -- e.g. 'Unexcused Absence, World History'
-    source_system_id   text REFERENCES lineage.source_system,
-    source_record_id   text,                     -- the record's id in the source system
     recorded_at        timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (ods_resource, ods_id)
+);
+
+-- Every modification of an ODS record: which application, and when (option 2)
+CREATE TABLE lineage.ods_record_change (
+    ods_resource       text NOT NULL,
+    ods_id             uuid NOT NULL,
+    application_id     text NOT NULL REFERENCES lineage.application,
+    modified_at        timestamptz NOT NULL,
+    PRIMARY KEY (ods_resource, ods_id, modified_at, application_id),
+    FOREIGN KEY (ods_resource, ods_id) REFERENCES lineage.ods_record
 );
 
 -- Which ODS records support which indicator for a student
@@ -80,16 +105,23 @@ The link is by indicator, not by fact row: the question an educator asks is
 absences, not a list of daily fact rows. The same ODS record can support more
 than one indicator.
 
+`ods_record_change` holds what option 2 would add to the API: when API 8
+reports `_lineage`, a load can copy it here unchanged.
+
 ### Populated by hand, for a demonstration set
 
 A script fills the tables for a few students who appear in the demonstration
-(for example the teacher's top at-risk students), from the ODS:
+(for example the teacher's top at-risk students), for all four indicators, from
+the ODS:
 
 - `ods_record` and `indicator_evidence` from the ODS rows behind each indicator:
   the absences up to today, the grades below passing in the latest grading
   period, the failing assessment results, the discipline actions;
-- `source_system` with one fictional SIS, and `source_record_id` with fictional
-  SIS identifiers, clearly marked as sample values.
+- `application` with a few fictional applications, such as a SIS, a gradebook,
+  an assessment vendor and an attendance app, clearly marked as samples;
+- `ods_record_change` with a made-up history for each record: the application
+  that created it, and for some records a later change by another application
+  (for example an absence later marked excused by the attendance app).
 
 "By hand" means a reviewed script for a chosen set of students, not an automated
 pipeline: it shows the shape and the value of lineage without claiming a
@@ -100,8 +132,8 @@ complete capture. A real deployment would record lineage when data is loaded.
 - Results that flag or describe a student say whether evidence is available.
 - A new tool, for example `get_indicator_evidence(student, indicator)`, returns
   the evidence for one student and indicator: for each record, the date, a
-  summary, the ODS resource and `id`, and the source system and record when
-  known. It is limited to students in the user's scope, like every other tool.
+  summary, the ODS resource and `id`, and its `_lineage` as in option 2. It is
+  limited to students in the user's scope, like every other tool.
 
 ## Options considered
 
@@ -117,10 +149,18 @@ Natural keys are readable but change when a key changes; the ODS `id` is stable
 and is what the Ed-Fi API uses to fetch a record. Chosen: both, with the `id` as
 the key and the natural key for people to read.
 
+### One source system per record, or a history of changes
+
+A single source system and source record id per record is simpler, but it
+doesn't match any of the Ed-Fi API lineage options, and it can't show a record
+that more than one application touched. Option 1 of the proposal (last modified
+by) has the same limit; option 3 (the fields modified) needs more than the ODS
+can supply here. Chosen: option 2, the application and time of every change.
+
 ### Populate everything automatically now, or a demonstration set by hand
 
 Generating evidence for every student is possible for the ODS part, but the
-source system part has to be supplied, and the brief calls for manual
+application history has to be supplied, and the brief calls for manual
 population first. Chosen: a demonstration set by hand; automatic population is
 a later improvement.
 
@@ -130,12 +170,8 @@ a later improvement.
   behind it change; the demonstration script can be rerun.
 - Students outside the demonstration set have no evidence yet; tools say so
   rather than inventing it.
-- Source system identifiers in the demonstration are fictional; the
+- The applications and their changes in the demonstration are fictional; the
   documentation says so.
-
-## Open questions
-
-- Should the demonstration cover all four indicators, or start with attendance?
-- Is a fictional SIS with made-up record identifiers acceptable for the
-  demonstration, or should the source system part wait for real data?
-- Should the shape follow any draft of the Ed-Fi API 8 lineage work?
+- The proposal also asks whether lineage should include the education
+  organization behind a change, not just the application. That isn't in this
+  design; it can be added to `ods_record_change` if the API work settles it.
