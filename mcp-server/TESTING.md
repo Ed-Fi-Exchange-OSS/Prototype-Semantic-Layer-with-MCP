@@ -1,18 +1,23 @@
 # Early warning MCP server: test results
 
-What was tested, how, and what happened. Run on 2026-11-05 against the local
+What was tested, how, and what happened. Sign-in was tested on 2026-11-06; the
+rest ran on 2026-11-05, against the local
 data mart built from Northridge (see [`datamart/`](../datamart/README.md)),
 moved to the 2026-2027 school year. The raw results are in
 [`test/evidence/`](./test/evidence/): `2026-11-05-https/` for the current code
 (over HTTPS), `2026-11-05-behavior/` for the same code over plain HTTP, and
 `2026-11-05/` for a first round of assistant runs, before the behavior indicator
-was added.
+was added. `2026-11-06-sign-in/` has the sign-in checks.
+
+The assistant runs (section 5) used the demo user, before sign-in was added; the
+tools haven't changed since.
 
 ## Summary
 
 | Area | What was checked | Result |
 | --- | --- | --- |
 | Automated tests | 24 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling | ✅ 24/24 pass |
+| Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each role; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
 | AI assistants | 6 prompts each in Claude Code and GitHub Copilot, in three rounds: 3 a teacher would ask, 3 that try to get data outside the teacher's scope | ✅ 36/36 as expected; no data outside the scope in any answer |
@@ -68,7 +73,47 @@ Output: [`npm-test.txt`](./test/evidence/2026-11-05-behavior/npm-test.txt).
   - the superintendent sees every student in the district, including the one
     outside the teacher's scope, and `get_my_scope` names the district.
 
-## 2. Database role
+## 2. Sign-in
+
+The server only accepts access tokens that Keycloak issued for it (see
+[ADR 0002](../docs/adr/0002-sign-in-with-keycloak.md)).
+
+**Automated:** `test/auth.test.ts` runs the HTTP handler with real tokens from
+the local Keycloak. Output:
+[`npm-test.txt`](./test/evidence/2026-11-06-sign-in/npm-test.txt), 30 tests
+with the tool tests.
+
+- The protected resource metadata names Keycloak as the authorization server.
+- A request without a token gets `401` and
+  `WWW-Authenticate: Bearer resource_metadata="..."`, not the demo user's data.
+- A malformed token, a token signed with another key, and a Keycloak token
+  issued to another client (without this server as audience) each get `401`
+  with `error="invalid_token"`.
+- A token presented after it expired gets `401`.
+- The teacher, the principal and the superintendent, each signed in, see their
+  own scope: 716, 3,174 and 21,194 students.
+
+**Containers over HTTPS:** the metadata, the `401` without a token, and a call
+with the principal's token (her school, 3,174 students) worked against the
+server container.
+
+**Browser sign-in:** [`test/sign-in/pkce-flow.mjs`](./test/sign-in/pkce-flow.mjs)
+plays the MCP client's part of the authorization code flow with PKCE. Output:
+[`pkce-flow.txt`](./test/evidence/2026-11-06-sign-in/pkce-flow.txt).
+
+1. It found Keycloak from the server's protected resource metadata.
+2. The teacher signed in on Keycloak's page in a browser; Keycloak redirected
+   with a code, and the `state` matched.
+3. The code was exchanged for an access token: issuer
+   `https://localhost:8443/realms/edfi`, audience `https://localhost:3000/mcp`,
+   client `edfi-mcp`, verified email.
+4. With that token, the server returned the teacher's own data: 716 students in
+   4 sections, and her at-risk list.
+
+Also checked on the client: it refuses the password grant, redirect URIs that
+aren't registered, and sign-in without PKCE.
+
+## 3. Database role
 
 Checked by connecting as `mcp_reader`, the role the server uses:
 
@@ -81,7 +126,7 @@ Checked by connecting as `mcp_reader`, the role the server uses:
   denied for schema ods_analytics".
 - The ODS itself (`edfi.student`): ❌ "permission denied for schema edfi".
 
-## 3. HTTPS and Docker
+## 4. HTTPS and Docker
 
 `docker compose --profile mcp up -d --build` in `datamart/` creates the
 self-signed certificate, then builds and starts the server, which connects to
@@ -97,7 +142,7 @@ the data mart as `mcp_reader`. An MCP client (official SDK, Streamable HTTP) on
 Without trusting the certificate, the client fails with "self-signed
 certificate"; plain HTTP on the same port gets no answer.
 
-## 4. AI assistants
+## 5. AI assistants
 
 **Method:**
 [`test/assistants/run.py`](./test/assistants/run.py) runs each prompt in a fresh
@@ -165,7 +210,7 @@ ones the user may see**.
   with its local tools to count rows; that copy only holds what the server
   returned.
 
-## 5. Speed
+## 6. Speed
 
 Time for one call through the MCP client, on a laptop with the data mart in
 Docker:
@@ -185,7 +230,8 @@ district.
 
 ## Not tested yet
 
-- Sign-in through OAuth (later phases); the roles were tested with demo users.
+- Claude Code's and VS Code's own sign-in: the flow they use was checked with a
+  script (section 2), but not by signing in from the assistants themselves.
 - Assistant principals and the LEA administrator: the sample data doesn't map
   their staff classifications to a scope, so they see no students.
 - Lineage in the results (later phases).
