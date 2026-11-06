@@ -1,13 +1,14 @@
 # Early warning MCP server: test results
 
-What was tested, how, and what happened. Sign-in was tested on 2026-11-06; the
-rest ran on 2026-11-05, against the local
+What was tested, how, and what happened. Sign-in and lineage were tested on
+2026-11-06; the rest ran on 2026-11-05, against the local
 data mart built from Northridge (see [`datamart/`](../datamart/README.md)),
 moved to the 2026-2027 school year. The raw results are in
 [`test/evidence/`](./test/evidence/): `2026-11-05-https/` for the current code
 (over HTTPS), `2026-11-05-behavior/` for the same code over plain HTTP, and
 `2026-11-05/` for a first round of assistant runs, before the behavior indicator
-was added. `2026-11-06-sign-in/` has the sign-in checks.
+was added. `2026-11-06-sign-in/` has the sign-in checks, and
+`2026-11-06-lineage/` the lineage checks with the current code.
 
 The assistant runs (section 5) used the demo user, before sign-in was added; the
 tools haven't changed since.
@@ -16,7 +17,8 @@ tools haven't changed since.
 
 | Area | What was checked | Result |
 | --- | --- | --- |
-| Automated tests | 24 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling | ✅ 24/24 pass |
+| Automated tests | 32 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling; lineage | ✅ 32/32 pass |
+| Lineage | The evidence behind each indicator for the demonstration students, checked against the indicator counts; scope; the server container with a signed-in teacher and principal | ✅ Evidence matches the counts; nothing outside the scope |
 | Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each of 5 roles; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
@@ -33,10 +35,11 @@ the superintendent, who may see the district.
 `npm test` (see [README](./README.md#develop)) runs each tool through a real MCP
 client connected in memory to the server, against the data mart, and compares
 the results with direct queries. Run as `mcp_reader`, the role the server uses.
-Output: [`npm-test.txt`](./test/evidence/2026-11-05-behavior/npm-test.txt).
+Output: [`npm-test.txt`](./test/evidence/2026-11-06-lineage/npm-test.txt), with
+the sign-in tests (38 in all).
 
 - **Tool list:**
-  - the six tools are present, each marked read-only and described;
+  - the seven tools are present, each marked read-only and described;
   - no tool takes a user, email, SQL, table or column as a parameter.
 - **`get_my_scope`, `list_my_sections`:** the counts match the authorization
   tables; only the teacher's sections come back.
@@ -55,6 +58,7 @@ Output: [`npm-test.txt`](./test/evidence/2026-11-05-behavior/npm-test.txt).
   discipline action after today is included.
 - **`get_attendance_trend`:** at most the weeks asked for, each starting on a
   Monday; it needs exactly one of student and section.
+- **`get_indicator_evidence`:** see [section 7](#7-lineage).
 - **Scope:**
   - a student outside the teacher's scope returns nothing from any tool (no
     summary, no trend, not found by name, not in the at-risk list);
@@ -230,10 +234,47 @@ The at-risk list reads every day of attendance for every student in scope, so
 it grows with the scope; it stays under a second and a half for the whole
 district.
 
+## 7. Lineage
+
+The lineage tables ([ADR 0003](../docs/adr/0003-lineage-sidecar-tables.md)) hold
+308 records for six students of the demo teacher, built with the data mart:
+270 absences from class, 32 grades below 70, 5 low assessment results and 1
+discipline action. The source system, "Northridge SIS (fictional sample)", and
+its record ids (`SAMPLE-ATT-...`) are made up.
+
+**Automated** (in `npm test`):
+
+- `list_students_at_risk` and `get_student_summary` list in `evidence` exactly
+  the indicators that have records.
+- Each record has a date no later than the build, the ODS resource and `id`, the
+  natural key with the student's id, and the sample source system; the newest
+  come first.
+- For each demonstration student, the evidence matches the indicator: as many
+  days with an absence as `days_absent`, as many grades as `failing_grades`, as
+  many results as `low_assessments`, as many actions as `discipline_actions`.
+- The row limit caps the records and sets `truncated`.
+- A student in scope without lineage gets an empty list and a note saying
+  lineage covers a demonstration set only.
+- A student outside the teacher's scope gets an error and no records, including
+  a student who has lineage records.
+- An indicator other than the four is rejected.
+
+**Server container:**
+[`test/lineage/evidence-call.mjs`](./test/lineage/evidence-call.mjs) signs in
+through Keycloak and calls the container over HTTPS.
+
+- The teacher, for student `004688`: four indicators, evidence for all four, and
+  the first records of each
+  ([`teacher-evidence.txt`](./test/evidence/2026-11-06-lineage/teacher-evidence.txt)).
+- The Ridgemont High principal, for a student of another school (`000001`): "No
+  student 000001 among the students you may see." for each indicator
+  ([`principal-outside-scope.txt`](./test/evidence/2026-11-06-lineage/principal-outside-scope.txt)).
+
 ## Not tested yet
 
 - Claude Code's and VS Code's own sign-in: the flow they use was checked with a
   script (section 2), but not by signing in from the assistants themselves.
-- Lineage in the results (later phases).
 - Other MCP clients (Claude Desktop, VS Code) beyond the two CLIs above; they
   use the same transport.
+- Lineage for students outside the demonstration set, and lineage recorded when
+  data is loaded rather than by a script.

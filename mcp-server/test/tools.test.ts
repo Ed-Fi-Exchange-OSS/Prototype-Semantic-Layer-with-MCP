@@ -85,10 +85,11 @@ describe('early warning tools', () => {
     });
 
     describe('tool list', () => {
-        test('has the six tools, each read-only and described', async () => {
+        test('has the seven tools, each read-only and described', async () => {
             const { tools } = await client.listTools();
             assert.deepEqual(tools.map(t => t.name).sort(), ['find_students', 'get_attendance_trend',
-                'get_my_scope', 'get_student_summary', 'list_my_sections', 'list_students_at_risk']);
+                'get_indicator_evidence', 'get_my_scope', 'get_student_summary', 'list_my_sections',
+                'list_students_at_risk']);
             for (const tool of tools) {
                 assert.equal(tool.annotations?.readOnlyHint, true, tool.name);
                 assert.ok((tool.description ?? '').length > 40, tool.name);
@@ -242,6 +243,125 @@ describe('early warning tools', () => {
             for (const a of summary.assessments ?? []) {
                 assert.ok(a.date.replaceAll('-', '') <= today, `assessment dated ${a.date}`);
             }
+        });
+    });
+
+    describe('get_indicator_evidence', () => {
+        // The demonstration students in the teacher's scope that have lineage records
+        let demo: string[];
+        // The day the lineage was built: the data mart counts are compared as of that day
+        let builtOn: string;
+
+        before(async () => {
+            demo = (await rows(
+                `SELECT DISTINCT e.student_key FROM lineage.indicator_evidence e
+                 JOIN analytics.rls_userstudentdataauthorization a
+                   ON a.studentkey = e.student_key AND a.userkey = $1
+                 ORDER BY 1`, [teacher])).map(r => r.student_key);
+            [{ built_on: builtOn }] = await rows(
+                `SELECT to_char(max(recorded_at), 'YYYYMMDD') AS built_on FROM lineage.ods_record`);
+        });
+
+        async function evidence(student: string, indicator: string, limit = 100) {
+            return json(client, 'get_indicator_evidence', { student, indicator, limit });
+        }
+
+        test('the teacher has demonstration students with evidence', () => {
+            assert.ok(demo.length > 0, 'build the data mart with its lineage first');
+        });
+
+        test('at-risk results and summaries say which indicators have evidence', async () => {
+            const { students } = await json(client, 'list_students_at_risk', { limit: 100 });
+            for (const s of students) {
+                const [{ indicators }] = await rows(
+                    `SELECT coalesce(array_agg(DISTINCT indicator ORDER BY indicator), '{}') AS indicators
+                     FROM lineage.indicator_evidence WHERE student_key = $1`, [s.key]);
+                assert.deepEqual(s.evidence, indicators, s.key);
+            }
+            for (const key of demo) {
+                const summary = await json(client, 'get_student_summary', { student: key });
+                assert.ok(summary.evidence.length > 0, key);
+            }
+        });
+
+        test('each record has a date, an ODS id and the sample source system', async () => {
+            const result = await evidence(demo[0], 'attendance');
+            assert.equal(result.student, demo[0]);
+            assert.ok(result.total > 0 && result.records.length === result.total);
+            for (const r of result.records) {
+                assert.match(r.date, /^\d{4}-\d{2}-\d{2}$/);
+                assert.ok(r.date.replaceAll('-', '') <= builtOn, r.date);
+                assert.equal(r.ods_resource, 'studentSectionAttendanceEvents');
+                assert.match(r.ods_id, /^[0-9a-f-]{36}$/);
+                assert.equal(r.natural_key.studentUniqueId, demo[0]);
+                assert.match(r.source_system, /fictional sample/);
+                assert.match(r.source_record_id, /^SAMPLE-ATT-[0-9A-F]{8}$/);
+            }
+            const dates = result.records.map((r: Row) => r.date);
+            assert.deepEqual(dates, [...dates].sort().reverse(), 'newest first');
+        });
+
+        test('the evidence matches the indicator counts in the data mart', async () => {
+            for (const key of demo) {
+                const [direct] = await rows(
+                    `WITH latest_period AS (
+                         SELECT DISTINCT ON (schoolkey) schoolkey, gradingperiodkey
+                         FROM analytics.gradingperioddim WHERE gradingperiodbegindatekey <= $2
+                         ORDER BY schoolkey, gradingperiodbegindatekey DESC)
+                     SELECT
+                       (SELECT sum(greatest(isabsentfromanyclassexcused, isabsentfromanyclassunexcused))::int
+                        FROM analytics.ews_studentearlywarningfact WHERE studentkey = $1) AS attendance,
+                       (SELECT count(*)::int FROM analytics.ews_studentsectiongradefact g
+                        JOIN latest_period p USING (schoolkey, gradingperiodkey)
+                        WHERE g.studentkey = $1 AND g.numericgradeearned < 70) AS course_performance,
+                       (SELECT count(*)::int FROM analytics.asmt_studentassessmentfact
+                        WHERE studentkey = $1 AND administrationdate <= $2
+                          AND performanceresult IN ('Fail', 'Well Below Basic')) AS assessments,
+                       (SELECT count(DISTINCT regexp_replace(studentdisciplineactionkey, '-[^-]*$', ''))::int
+                        FROM analytics.equity_studentdisciplineactiondim
+                        WHERE studentkey = $1 AND disciplinedatekey <= $2) AS behavior`, [key, builtOn]);
+                const attendance = await evidence(key, 'attendance');
+                // Attendance evidence is one record per class; the indicator counts days
+                assert.equal(new Set(attendance.records.map((r: Row) => r.date)).size, direct.attendance, key);
+                for (const indicator of ['course_performance', 'assessments', 'behavior']) {
+                    const result = await evidence(key, indicator);
+                    assert.equal(result.total, direct[indicator], `${key} ${indicator}`);
+                }
+            }
+        });
+
+        test('caps the records and says when it did', async () => {
+            const result = await evidence(demo[0], 'attendance', 2);
+            assert.equal(result.records.length, 2);
+            assert.ok(result.total > 2);
+            assert.equal(result.truncated, true);
+        });
+
+        test('a student in scope without lineage gets an empty list and a note', async () => {
+            const other = [...inScope].find(k => !demo.includes(k))!;
+            const result = await evidence(other, 'attendance');
+            assert.equal(result.total, 0);
+            assert.deepEqual(result.records, []);
+            assert.match(result.note, /demonstration set/);
+        });
+
+        test('a student outside the teacher\'s scope gets nothing, even with evidence', async () => {
+            const [hidden] = await rows(
+                `SELECT DISTINCT e.student_key FROM lineage.indicator_evidence e
+                 WHERE NOT EXISTS (SELECT 1 FROM analytics.rls_userstudentdataauthorization a
+                                   WHERE a.userkey = $1 AND a.studentkey = e.student_key) LIMIT 1`, [teacher]);
+            for (const key of [outsider.key, hidden?.student_key].filter(Boolean)) {
+                const response = await call(client, 'get_indicator_evidence',
+                    { student: key, indicator: 'attendance' });
+                assert.equal(response.isError, true, key);
+                assert.doesNotMatch(response.text, /ods_id/);
+            }
+        });
+
+        test('rejects an unknown indicator', async () => {
+            const response = await call(client, 'get_indicator_evidence',
+                { student: demo[0], indicator: 'grades' });
+            assert.equal(response.isError, true);
         });
     });
 
