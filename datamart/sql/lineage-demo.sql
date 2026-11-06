@@ -68,14 +68,15 @@ SELECT 'course_performance', 'grades', g.id,
        jsonb_build_object('studentUniqueId', s.studentuniqueid, 'schoolId', g.schoolid,
            'schoolYear', g.schoolyear, 'sessionName', g.sessionname, 'localCourseCode', g.localcoursecode,
            'sectionIdentifier', g.sectionidentifier, 'gradingPeriodName', g.gradingperiodname,
-           'gradeType', gt.codevalue),
+           'gradingPeriod', gp.codevalue, 'gradeType', gt.codevalue),
        s.studentuniqueid, latest.begindate,
        format('Grade %s (%s), %s, %s', g.numericgradeearned::int, g.lettergradeearned, g.localcoursecode,
-              g.gradingperiodname),
+              gp.codevalue),
        'GRD'
 FROM lineage_ods.grade g
 JOIN lineage_ods.student s ON s.studentusi = g.studentusi
 JOIN lineage_ods.descriptor gt ON gt.descriptorid = g.gradetypedescriptorid
+JOIN lineage_ods.descriptor gp ON gp.descriptorid = g.gradingperioddescriptorid
 JOIN (SELECT DISTINCT ON (schoolid)
              schoolid, schoolyear, gradingperiodname, gradingperioddescriptorid, begindate
       FROM lineage_ods.gradingperiod

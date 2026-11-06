@@ -86,8 +86,8 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
     server.registerTool('list_students_at_risk', {
         title: 'Students at risk',
         description: 'Lists the students the signed-in educator may see who meet at least one early warning '
-            + 'indicator: absent from any class on at least absence_threshold percent of instructional days '
-            + 'so far, a grade below passing_grade in the latest grading period, a Fail or Well Below Basic '
+            + 'indicator: absent from at least one class on at least absence_threshold percent of '
+            + 'instructional days so far, a grade below passing_grade in the latest grading period, a Fail or Well Below Basic '
             + 'assessment result, or at least discipline_threshold discipline actions (removal from class, '
             + 'suspension, expulsion) so far. Sorted by the number of indicators, then by absence rate. '
             + '"evidence" lists the indicators whose records get_indicator_evidence can show.',
@@ -146,7 +146,9 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         description: 'Shows the records behind one early warning indicator for one student the signed-in '
             + 'educator may see: the absences, the grades below passing, the low assessment results or the '
             + 'discipline actions, each with its Ed-Fi ODS resource and id, and the source system and its '
-            + 'record id when known. Lineage covers a demonstration set of students; the "evidence" field of '
+            + 'record id when known. Attendance has one record per class missed: "days" is the number of '
+            + 'different days, the same as days_absent (days absent from at least one class). Lineage covers '
+            + 'a demonstration set of students; the "evidence" field of '
             + 'list_students_at_risk and get_student_summary says which indicators have records. The source '
             + 'system in the demonstration is a fictional sample.',
         inputSchema: {
@@ -158,16 +160,17 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         annotations: readOnly,
     }, args => withUser(async user => {
         const max = args.limit ?? DEFAULT_LIMIT;
-        const [row] = await query<{ evidence: { total: number; records: unknown[] } }>('indicator-evidence',
-            [user, args.student, args.indicator, max]);
+        const [row] = await query<{ evidence: { total: number; days: number; records: unknown[] } }>(
+            'indicator-evidence', [user, args.student, args.indicator, max]);
         if (!row) {
             return message(`No student ${args.student} among the students you may see.`);
         }
-        const { total, records } = row.evidence;
+        const { total, days, records } = row.evidence;
         return result({
             student: args.student,
             indicator: args.indicator,
             total,
+            days,
             records,
             truncated: total > records.length,
             ...(total === 0 && {
