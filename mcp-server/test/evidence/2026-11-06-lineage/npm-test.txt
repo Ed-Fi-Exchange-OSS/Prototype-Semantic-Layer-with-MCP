@@ -1,0 +1,326 @@
+
+> early-warning-mcp-server@0.1.0 test
+> node --test "dist/test/**/*.test.js"
+
+TAP version 13
+# Subtest: sign-in
+    # Subtest: publishes protected resource metadata that points to Keycloak
+    ok 1 - publishes protected resource metadata that points to Keycloak
+      ---
+      duration_ms: 23.9423
+      type: 'test'
+      ...
+    # Subtest: a request without a token gets 401 and where to sign in, not the demo user
+    ok 2 - a request without a token gets 401 and where to sign in, not the demo user
+      ---
+      duration_ms: 5.1978
+      type: 'test'
+      ...
+    # Subtest: rejects a malformed token, a forged token and a token for another audience
+    ok 3 - rejects a malformed token, a forged token and a token for another audience
+      ---
+      duration_ms: 101.966
+      type: 'test'
+      ...
+    # Subtest: rejects an expired token
+    ok 4 - rejects an expired token
+      ---
+      duration_ms: 57.9322
+      type: 'test'
+      ...
+    # Subtest: each signed-in user sees their own scope
+    ok 5 - each signed-in user sees their own scope
+      ---
+      duration_ms: 396.243
+      type: 'test'
+      ...
+    # Subtest: the signed-in user, not the demo user, decides what comes back
+    ok 6 - the signed-in user, not the demo user, decides what comes back
+      ---
+      duration_ms: 50.5529
+      type: 'test'
+      ...
+    1..6
+ok 1 - sign-in
+  ---
+  duration_ms: 640.3858
+  type: 'suite'
+  ...
+# Subtest: early warning tools
+    # Subtest: tool list
+        # Subtest: has the seven tools, each read-only and described
+        ok 1 - has the seven tools, each read-only and described
+          ---
+          duration_ms: 7.0844
+          type: 'test'
+          ...
+        # Subtest: no tool takes a user, SQL, table or column as a parameter
+        ok 2 - no tool takes a user, SQL, table or column as a parameter
+          ---
+          duration_ms: 1.6534
+          type: 'test'
+          ...
+        1..2
+    ok 1 - tool list
+      ---
+      duration_ms: 9.197
+      type: 'suite'
+      ...
+    # Subtest: get_my_scope and list_my_sections
+        # Subtest: get_my_scope matches the authorization tables
+        ok 1 - get_my_scope matches the authorization tables
+          ---
+          duration_ms: 8.5532
+          type: 'test'
+          ...
+        # Subtest: list_my_sections returns only the teacher's sections
+        ok 2 - list_my_sections returns only the teacher's sections
+          ---
+          duration_ms: 7.8514
+          type: 'test'
+          ...
+        1..2
+    ok 2 - get_my_scope and list_my_sections
+      ---
+      duration_ms: 16.6238
+      type: 'suite'
+      ...
+    # Subtest: find_students
+        # Subtest: matches part of the name, ignoring case, within scope
+        ok 1 - matches part of the name, ignoring case, within scope
+          ---
+          duration_ms: 13.7736
+          type: 'test'
+          ...
+        # Subtest: filters by section
+        ok 2 - filters by section
+          ---
+          duration_ms: 15.34
+          type: 'test'
+          ...
+        # Subtest: caps the rows and says when it did
+        ok 3 - caps the rows and says when it did
+          ---
+          duration_ms: 4.2262
+          type: 'test'
+          ...
+        1..3
+    ok 3 - find_students
+      ---
+      duration_ms: 33.717
+      type: 'suite'
+      ...
+    # Subtest: list_students_at_risk
+        # Subtest: every student is in scope, and the indicators match the numbers
+        ok 1 - every student is in scope, and the indicators match the numbers
+          ---
+          duration_ms: 215.6461
+          type: 'test'
+          ...
+        # Subtest: is sorted by indicators, then by absence rate
+        ok 2 - is sorted by indicators, then by absence rate
+          ---
+          duration_ms: 182.1418
+          type: 'test'
+          ...
+        # Subtest: uses the absence threshold it is given
+        ok 3 - uses the absence threshold it is given
+          ---
+          duration_ms: 181.7956
+          type: 'test'
+          ...
+        # Subtest: counts discipline actions up to today, once each
+        ok 4 - counts discipline actions up to today, once each
+          ---
+          duration_ms: 220.6899
+          type: 'test'
+          ...
+        # Subtest: filters by section
+        ok 5 - filters by section
+          ---
+          duration_ms: 118.8972
+          type: 'test'
+          ...
+        1..5
+    ok 4 - list_students_at_risk
+      ---
+      duration_ms: 919.5135
+      type: 'suite'
+      ...
+    # Subtest: get_student_summary
+        # Subtest: matches the data mart for a student in scope
+        ok 1 - matches the data mart for a student in scope
+          ---
+          duration_ms: 181.1451
+          type: 'test'
+          ...
+        1..1
+    ok 5 - get_student_summary
+      ---
+      duration_ms: 181.3177
+      type: 'suite'
+      ...
+    # Subtest: get_indicator_evidence
+        # Subtest: the teacher has demonstration students with evidence
+        ok 1 - the teacher has demonstration students with evidence
+          ---
+          duration_ms: 0.3213
+          type: 'test'
+          ...
+        # Subtest: at-risk results and summaries say which indicators have evidence
+        ok 2 - at-risk results and summaries say which indicators have evidence
+          ---
+          duration_ms: 287.499
+          type: 'test'
+          ...
+        # Subtest: each record has a date, an ODS id and the sample source system
+        ok 3 - each record has a date, an ODS id and the sample source system
+          ---
+          duration_ms: 5.3084
+          type: 'test'
+          ...
+        # Subtest: the evidence matches the indicator counts in the data mart
+        ok 4 - the evidence matches the indicator counts in the data mart
+          ---
+          duration_ms: 93.29
+          type: 'test'
+          ...
+        # Subtest: caps the records and says when it did
+        ok 5 - caps the records and says when it did
+          ---
+          duration_ms: 1.6844
+          type: 'test'
+          ...
+        # Subtest: a student in scope without lineage gets an empty list and a note
+        ok 6 - a student in scope without lineage gets an empty list and a note
+          ---
+          duration_ms: 1.5934
+          type: 'test'
+          ...
+        # Subtest: a student outside the teacher's scope gets nothing, even with evidence
+        ok 7 - a student outside the teacher's scope gets nothing, even with evidence
+          ---
+          duration_ms: 3.0104
+          type: 'test'
+          ...
+        # Subtest: rejects an unknown indicator
+        ok 8 - rejects an unknown indicator
+          ---
+          duration_ms: 0.5938
+          type: 'test'
+          ...
+        1..8
+    ok 6 - get_indicator_evidence
+      ---
+      duration_ms: 398.4767
+      type: 'suite'
+      ...
+    # Subtest: get_attendance_trend
+        # Subtest: returns at most the weeks asked for, each starting on a Monday
+        ok 1 - returns at most the weeks asked for, each starting on a Monday
+          ---
+          duration_ms: 24.8821
+          type: 'test'
+          ...
+        # Subtest: needs exactly one of student and section
+        ok 2 - needs exactly one of student and section
+          ---
+          duration_ms: 0.457
+          type: 'test'
+          ...
+        1..2
+    ok 7 - get_attendance_trend
+      ---
+      duration_ms: 25.4378
+      type: 'suite'
+      ...
+    # Subtest: scope
+        # Subtest: a student outside the teacher's scope returns nothing from any tool
+        ok 1 - a student outside the teacher's scope returns nothing from any tool
+          ---
+          duration_ms: 184.1437
+          type: 'test'
+          ...
+        # Subtest: another teacher who may see that student gets it
+        ok 2 - another teacher who may see that student gets it
+          ---
+          duration_ms: 10.4204
+          type: 'test'
+          ...
+        # Subtest: an extra "user" argument doesn't change whose data comes back
+        ok 3 - an extra "user" argument doesn't change whose data comes back
+          ---
+          duration_ms: 7.4609
+          type: 'test'
+          ...
+        # Subtest: a session with no user gets an error, not data
+        ok 4 - a session with no user gets an error, not data
+          ---
+          duration_ms: 1.6293
+          type: 'test'
+          ...
+        1..4
+    ok 8 - scope
+      ---
+      duration_ms: 203.8333
+      type: 'suite'
+      ...
+    # Subtest: roles
+        # Subtest: a principal sees students enrolled at their school, and no one else
+        ok 1 - a principal sees students enrolled at their school, and no one else
+          ---
+          duration_ms: 9.0042
+          type: 'test'
+          ...
+        # Subtest: the superintendent sees the district
+        ok 2 - the superintendent sees the district
+          ---
+          duration_ms: 15.9569
+          type: 'test'
+          ...
+        1..2
+    ok 9 - roles
+      ---
+      duration_ms: 25.0942
+      type: 'suite'
+      ...
+    # Subtest: input handling
+        # Subtest: rejects values out of range
+        ok 1 - rejects values out of range
+          ---
+          duration_ms: 0.9643
+          type: 'test'
+          ...
+        # Subtest: treats SQL in a parameter as plain text
+        ok 2 - treats SQL in a parameter as plain text
+          ---
+          duration_ms: 35.4016
+          type: 'test'
+          ...
+        # Subtest: the server's database session is read-only
+        ok 3 - the server's database session is read-only
+          ---
+          duration_ms: 1.85
+          type: 'test'
+          ...
+        1..3
+    ok 10 - input handling
+      ---
+      duration_ms: 38.3961
+      type: 'suite'
+      ...
+    1..10
+ok 2 - early warning tools
+  ---
+  duration_ms: 1906.4371
+  type: 'suite'
+  ...
+1..2
+# tests 38
+# suites 12
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2173.4026
