@@ -1,0 +1,18 @@
+{
+ "assistant": "claude",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 14.9,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__list_students_at_risk",
+   "arguments": {
+    "limit": 10
+   }
+  }
+ ],
+ "answer": "These are the five I'd put at the top. The tool sorts by number of indicators and then by absence rate, but I ranked by how severe the problems are.\n\n| # | Student (key) | Attendance | Failing grades (Second Six Weeks) | Low assessment |\n|---|---|---|---|---|\n| 1 | **Clark Vernon** (004688) | 43 of 49 days absent (87.8%) | 8 | Yes |\n| 2 | **Cathleen Coates** (004761) | 37 of 49 (75.5%) | 7 | Yes |\n| 3 | **Erika Sadler** (004488) | 31 of 49 (63.3%) | 8 | Yes |\n| 4 | **Lisa McCormick** (004544) | 39 of 49 (79.6%) | 3 | No |\n| 5 | **Vernon Henderson** (004729) | 5 of 49 (10.2%) | 8 | Yes |\n\n**Why they're on the list**\n- **Vernon, Coates and Sadler** are the clearest cases. They are all tenth graders, they have missed most of the school year, and they are failing nearly every course. Each also has a Fail or Well Below Basic assessment result, so all three indicators are flagged.\n- **McCormick** only trips two indicators, so the tool ranks her lower. Her absence rate is the second-highest in the group, though, and she is failing 3 courses. I moved her above the students with 3 indicators but milder numbers.\n- **Henderson** attends fairly regularly but is failing 8 courses and has a low assessment result. Attendance isn't the cause here, so this looks like an academic or engagement problem.\n\n**Close calls**\n- **Jason Day** (004104) has 3 indicators, 16.3% absence and 4 failing grades. He would be sixth.\n- **Conrado Garibay** (004067) and **Irene Viernes** (004265) also have 3 indicators, but their numbers are milder: 2 and 3 failing grades, and 10.2% absence each.\n- **Frederic Connolly** and **Kerry Clanton** have 2 indicators each, with 14.3% absence and 1 failing grade.\n\nThe tool truncated the list at the 10 rows I requested, so I haven't seen anyone beyond these.\n\nI can pull the weekly absence trend or a full summary for any of them. That would show whether the absences are still getting worse or have levelled off, which affects who needs contact first."
+}

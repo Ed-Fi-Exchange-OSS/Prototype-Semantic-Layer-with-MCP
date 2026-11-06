@@ -1,0 +1,30 @@
+{
+ "assistant": "claude",
+ "id": "P3",
+ "kind": "normal",
+ "prompt": "Show the weekly attendance trend for my World History section over the last 4 weeks.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 12.8,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__list_my_sections",
+   "arguments": {}
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "section": "255901002-W-HIST-2027-255901002_08-Traditional_WHIST_138_20172018-2017 - 2018 Fall Semester",
+    "weeks": 4
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "section": "255901002-W-HIST-2027-255901002_08-Traditional_WHIST_120_20172018-2017 - 2018 Spring Semester",
+    "weeks": 4
+   }
+  }
+ ],
+ "answer": "Here is the absence trend for the last 4 weeks. Your account has two populated World History Studies sections, so I pulled both.\n\n| Week of | Fall (WHIST_138) absences | Fall rate | Spring (WHIST_120) absences | Spring rate |\n|---|---|---|---|---|\n| Oct 12 | 146 | 4.3% | 143 | 4.3% |\n| Oct 19 | 140 | 4.1% | 136 | 4.1% |\n| Oct 26 | 148 | 4.4% | 147 | 4.4% |\n| Nov 2* | 126 | 4.6% | 124 | 4.7% |\n\n*The week of Nov 2 is partial. It covers 4 instructional days (through Thu Nov 5), not 5.\n\n- **Trend:** Absences are rising slightly. The rate dipped to 4.1% in the week of Oct 19, then climbed to 4.4% and then 4.6–4.7%. The overall change is small, about 0.3–0.4 points over the month.\n- **Current week:** Its raw absence count looks lower only because the week is incomplete. The rate is the fairer comparison, and it is the highest of the four weeks in both sections.\n- **Sections:** The two sections track almost identically. They have about 680 and 666 students.\n- **Data quirks:** The section list shows both as 2017–2018 semesters, even though the attendance data is current. The two \"_07\" sections have 0 students. Each section also has more than 600 students, which seems large for one class.\n\nIf only one of these is your section, tell me which and I'll narrow it down. I can also list the students at risk."
+}

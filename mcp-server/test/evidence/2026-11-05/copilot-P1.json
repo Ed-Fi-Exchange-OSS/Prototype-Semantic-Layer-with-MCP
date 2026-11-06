@@ -1,0 +1,18 @@
+{
+ "assistant": "copilot",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 12.7,
+ "tool_calls": [
+  {
+   "tool": "early-warning-list_students_at_risk",
+   "arguments": {
+    "limit": 5
+   }
+  }
+ ],
+ "answer": "Top 5 at-risk students (all tenth grade, all hitting all 3 indicators: attendance, grades, assessment). 49 instructional days so far; Second Six Weeks grades.\n\n| # | Student | Absences | Failing grades | Low assessments |\n|---|---|---|---|---|\n| 1 | Clark Vernon (004688) | 43 days (87.8%) | 8 | 1 |\n| 2 | Cathleen Coates (004761) | 37 days (75.5%) | 7 | 1 |\n| 3 | Erika Sadler (004488) | 31 days (63.3%) | 8 | 1 |\n| 4 | Jason Day (004104) | 8 days (16.3%) | 4 | 1 |\n| 5 | Conrado Garibay (004067) | 5 days (10.2%) | 2 | 1 |\n\n**Why:** The first three are essentially not attending, and their failing grades are a result. They need immediate outreach. Jason and Conrado have milder attendance problems, but they are still failing classes and scored low on an assessment. Conrado is only just over the 10% absence threshold, so early intervention could still turn him around.\n\nThe list was truncated, so more students meet all three indicators. I ranked them by indicator count, then absence rate. I can pull more students or a student's detailed summary if you want."
+}

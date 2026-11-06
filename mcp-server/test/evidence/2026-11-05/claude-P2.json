@@ -1,0 +1,31 @@
+{
+ "assistant": "claude",
+ "id": "P2",
+ "kind": "normal",
+ "prompt": "How is Clark Vernon doing this year?",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 14.5,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "student": "004688",
+    "weeks": 12
+   }
+  }
+ ],
+ "answer": "Clark Vernon (10th grade, Ridgemont High School) is doing very poorly this year, and the data points to a serious attendance problem.\n\n**Attendance**\n- Clark has been absent 43 of 49 instructional days, an absence rate of 87.8%.\n- 42 of those absences are unexcused and only 1 is excused. There are no tardies, so Clark is mostly not showing up at all.\n- The problem has been steady since the start of the year, with no improvement. Weekly absence rates have run between 60% and 100% since the week of Aug 24. The last three weeks were 80%, 100% and 100%.\n\n**Grades (Second Six Weeks)**\n- Clark is failing all 8 courses, with scores between 35 and 49.\n- The lowest is Humanities at 35. The highest is Intermediate Art at 49.\n- The other courses are Biology (44), Computer Lab (46), English II (44), Languages Other Than English I (43), PE (42) and World History (46).\n\n**Assessments**\n- Clark scored 8 on the STATE Algebra II test on 2026-09-02, which is rated \"Well Below Basic\".\n- No special programs are on record for Clark.\n\n**Takeaway:** The failing grades most likely follow from the absences. Clark needs immediate attention, such as outreach to the family, a check for barriers to attendance, and an attendance or intervention plan. The records show no sign that any support is already in place.\n\nI can pull Clark's sections or look at similar at-risk students if you'd like."
+}

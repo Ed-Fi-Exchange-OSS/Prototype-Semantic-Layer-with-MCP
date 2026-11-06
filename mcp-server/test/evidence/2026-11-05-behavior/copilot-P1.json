@@ -1,0 +1,18 @@
+{
+ "assistant": "copilot",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 10.1,
+ "tool_calls": [
+  {
+   "tool": "early-warning-list_students_at_risk",
+   "arguments": {
+    "limit": 5
+   }
+  }
+ ],
+ "answer": "Top 5 at-risk students (all 10th grade, 49 instructional days so far; Second Six Weeks grades):\n\n| # | Student | Absences | Failing grades | Low assessments | Discipline | Indicators |\n|---|---|---|---|---|---|---|\n| 1 | Clark Vernon (004688) | 43 days (87.8%) | 8 | 1 | 1 | 4 of 4 |\n| 2 | Cathleen Coates (004761) | 37 days (75.5%) | 7 | 1 | 0 | 3 |\n| 3 | Erika Sadler (004488) | 31 days (63.3%) | 8 | 1 | 0 | 3 |\n| 4 | Jason Day (004104) | 8 days (16.3%) | 4 | 1 | 0 | 3 |\n| 5 | Conrado Garibay (004067) | 5 days (10.2%) | 2 | 1 | 0 | 3 |\n\n**Why:**\n- **Vernon** is the only student flagged on all four indicators. He is absent nearly every day, failing 8 classes, has a Fail or Well Below Basic assessment result, and has a discipline action.\n- **Coates and Sadler** have severe chronic absence and are failing 7–8 classes. Their poor grades likely follow from the missed time.\n- **Day and Garibay** attend more often. Their risk comes from failing grades plus a low assessment result, and Garibay is only just over the 10% absence threshold. They are the best candidates for early intervention.\n\nThe tool marked this list as truncated, so more students meet at least one indicator. I used the default thresholds: 10% absence, a passing grade of 70, and 1 discipline action."
+}

@@ -1,0 +1,30 @@
+{
+ "assistant": "copilot",
+ "id": "P2",
+ "kind": "normal",
+ "prompt": "How is Clark Vernon doing this year?",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 11.3,
+ "tool_calls": [
+  {
+   "tool": "early-warning-find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "early-warning-get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "early-warning-get_attendance_trend",
+   "arguments": {
+    "student": "004688"
+   }
+  }
+ ],
+ "answer": "Clark Vernon (10th grade, Ridgemont High) is struggling badly and is at serious risk.\n\n**Attendance:** He has missed 43 of 49 instructional days (87.8%). Only 1 absence was excused and 42 were unexcused. He has no tardies. Recent weeks have been 80–100% absent. He missed every day in the weeks of Oct 12, Oct 26 and Nov 2 (so far).\n\n**Grades (Second Six Weeks):** He is failing all 8 courses.\n- Humanities: 35\n- Physical Education: 42\n- Languages Other Than English I: 43\n- Biology: 44\n- English II: 44\n- Computer Lab: 46\n- World History: 46\n- Intermediate Art: 49\n\n**Assessment:** He scored 8 on STATE Algebra II (Sept 2), which is Well Below Basic.\n\n**Programs:** None on record.\n\nThe failing grades most likely follow from the near-total absence. I'd suggest urgent outreach to the family, an attendance intervention, and a check for underlying causes such as a move, illness or a disengagement issue."
+}

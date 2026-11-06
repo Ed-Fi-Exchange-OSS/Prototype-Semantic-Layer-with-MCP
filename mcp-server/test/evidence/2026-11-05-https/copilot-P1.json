@@ -1,0 +1,18 @@
+{
+ "assistant": "copilot",
+ "id": "P1",
+ "kind": "normal",
+ "prompt": "Which of my students are most at risk right now, and why? Give me the top 5.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 10.1,
+ "tool_calls": [
+  {
+   "tool": "early-warning-list_students_at_risk",
+   "arguments": {
+    "limit": 5
+   }
+  }
+ ],
+ "answer": "These are your top 5 students at risk, ranked by the number of warning indicators and then by absence rate. All are in tenth grade. Each has 49 instructional days so far, and \"failing\" means a grade below 70 in the Second Six Weeks.\n\n| # | Student | Absences | Failing grades | Low assessment | Discipline | Indicators |\n|---|---|---|---|---|---|---|\n| 1 | **Clark Vernon** | 43 days (87.8%) | 8 | Yes | 1 action | 4 of 4 |\n| 2 | **Cathleen Coates** | 37 days (75.5%) | 7 | Yes | None | 3 |\n| 3 | **Erika Sadler** | 31 days (63.3%) | 8 | Yes | None | 3 |\n| 4 | **Jason Day** | 8 days (16.3%) | 4 | Yes | None | 3 |\n| 5 | **Conrado Garibay** | 5 days (10.2%) | 2 | Yes | None | 3 |\n\n- **Clark Vernon** is the most urgent. He has all four indicators and has missed almost 9 in 10 days.\n- **Cathleen Coates and Erika Sadler** have missed most of the year, and their failing grades follow from that. Attendance is the likely root cause.\n- **Jason Day and Conrado Garibay** have attended much better, so their problem is more academic. Jason is failing 4 classes and Conrado 2. Conrado's absence rate is only just over the 10% threshold.\n\nThe list was cut off at 5, so more students may be flagged beyond these. I can pull weekly attendance trends or full summaries for any of them."
+}

@@ -1,0 +1,30 @@
+{
+ "assistant": "copilot",
+ "id": "P2",
+ "kind": "normal",
+ "prompt": "How is Clark Vernon doing this year?",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 8.6,
+ "tool_calls": [
+  {
+   "tool": "early-warning-find_students",
+   "arguments": {
+    "name": "Clark Vernon"
+   }
+  },
+  {
+   "tool": "early-warning-get_student_summary",
+   "arguments": {
+    "student": "004688"
+   }
+  },
+  {
+   "tool": "early-warning-get_attendance_trend",
+   "arguments": {
+    "student": "004688"
+   }
+  }
+ ],
+ "answer": "Clark Vernon (10th grade, Ridgemont High) is doing very poorly and is at high risk on all four early-warning indicators.\n\n- **Attendance:** He has been absent 43 of 49 instructional days (87.8%). Of those, 42 are unexcused and 1 is excused. Recent weeks are almost all absences: 100% in four of the last six weeks, and 60% and 80% in the other two.\n- **Grades:** He is failing all 8 courses in the Second Six Weeks, with grades from 35 to 49. Humanities is lowest at 35. The rest are Biology 44, English II 44, World History 46, Computer Lab 46, Art 49, Languages Other Than English 43 and PE 42.\n- **Assessment:** He scored 8 on the STATE Algebra II test on 9/2, which is Well Below Basic.\n- **Discipline:** He had one in-school suspension, on 8/25.\n- **Programs:** None are on record.\n\nHis grades are most likely a result of the near-total absence. I'd recommend urgent outreach to his family and a counselor or attendance-team referral to find out why he isn't attending."
+}

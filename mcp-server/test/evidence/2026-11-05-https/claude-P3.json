@@ -1,0 +1,30 @@
+{
+ "assistant": "claude",
+ "id": "P3",
+ "kind": "normal",
+ "prompt": "Show the weekly attendance trend for my World History section over the last 4 weeks.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 13.7,
+ "tool_calls": [
+  {
+   "tool": "mcp__early-warning__list_my_sections",
+   "arguments": {}
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "section": "255901002-W-HIST-2027-255901002_08-Traditional_WHIST_138_20172018-2017 - 2018 Fall Semester",
+    "weeks": 4
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "section": "255901002-W-HIST-2027-255901002_08-Traditional_WHIST_120_20172018-2017 - 2018 Spring Semester",
+    "weeks": 4
+   }
+  }
+ ],
+ "answer": "Your account has two World History Studies sections with students. Both are labeled 2017–2018 (Fall and Spring), but the attendance data runs through the current weeks. Their trends are almost the same.\n\n**Fall Semester section (about 679 students)**\n\n| Week of | Absences | Absence rate |\n|---|---|---|\n| Oct 12 | 146 | 4.3% |\n| Oct 19 | 140 | 4.1% |\n| Oct 26 | 148 | 4.4% |\n| Nov 2 (partial) | 126 | 4.6% |\n\n**Spring Semester section (about 666 students)**\n\n| Week of | Absences | Absence rate |\n|---|---|---|\n| Oct 12 | 143 | 4.3% |\n| Oct 19 | 136 | 4.1% |\n| Oct 26 | 147 | 4.4% |\n| Nov 2 (partial) | 124 | 4.7% |\n\n- **Overall trend:** Absence rates are slightly up. They dipped to 4.1% the week of Oct 19, then rose to 4.4% and 4.6–4.7%. The range is narrow, only about half a percentage point.\n- **Current week:** The Nov 2 week is partial. It covers about 2,700 instructional days against about 3,400 in a full week. A rate is comparable across weeks, but the raw absence count (126) isn't. The 4.6–4.7% rate is already the highest of the four weeks.\n- **Other sections:** Two other sections, Fall `_07` and Spring `_07`, have 0 students, so I left them out.\n\nDo you want me to list the students at risk in either section?"
+}
