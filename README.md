@@ -10,6 +10,11 @@ Forward](https://docs.ed-fi.org/getting-started/provider-playbook/implementation
 which were further elucidated in the [Ed-Fi and AI Special Interest Group
 2026](https://edfi.atlassian.net/wiki/spaces/ESIG/pages/2361622529/Ed-Fi+and+AI+Special+Interest+Group+2026).
 
+## Contents
+
+- [`datamart/`](./datamart/README.md): the semantic layer, a PostgreSQL data
+  mart for the early warning use case, built from the Northridge sample data.
+
 ## License
 
 Copyright (c) 2026, Ed-Fi Alliance, LLC. All rights reserved.
