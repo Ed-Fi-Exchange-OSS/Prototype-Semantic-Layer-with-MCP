@@ -1,0 +1,44 @@
+VS Code with GitHub Copilot Chat (agent mode), 2026-11-06, against the server container on
+https://localhost:3000/mcp. server.crt trusted in the Windows certificate store for the current user.
+.vscode/mcp.json:
+  { "servers": { "early-warning": { "type": "http", "url": "https://localhost:3000/mcp" } } }
+VS Code asked for a client ID (edfi-mcp, no secret) and opened Keycloak in the browser; the teacher
+(tina.blevins@RidgemontHighSchool.edu) signed in. Copilot Chat output, as shown.
+
+------------------------------------------------------------------------------------------------------------
+> Which of my students are most at risk, and what is the evidence for the top one's attendance?
+
+Students at risk
+Completed with input: {
+  "limit": 10
+}
+
+Indicator evidence
+Completed with input: {
+  "student": "004688",
+  "indicator": "attendance",
+  "limit": 10
+}
+
+## Most at-risk students (as of 2026-11-06)
+
+Ranked by number of indicators flagged, then by absence rate:
+
+| # | Student | Absence rate | Failing grades | Low assessments | Discipline | Indicators |
+|---|---|---|---|---|---|---|
+| 1 | **Clark Vernon** (004688) | 88% (44 of 50 days) | 8 | 1 | 1 | 4 |
+| 2 | Cathleen Coates (004761) | 74% (37 days) | 7 | 1 | 0 | 3 |
+| 3 | Erika Sadler (004488) | 64% (32 days) | 8 | 1 | 0 | 3 |
+| 4 | Jason Day (004104) | 16% (8 days) | 4 | 1 | 0 | 3 |
+| 5 | Conrado Garibay (004067) | 10% (5 days) | 2 | 1 | 0 | 3 |
+
+The list was capped at 10 and was truncated, so there may be more flagged students. All of the students shown are in Tenth grade.
+
+## Clark Vernon's attendance evidence
+
+- **Total:** 51 absence records, covering 44 distinct days absent. There is one record per class missed. I pulled the 10 most recent.
+- **Pattern:** All 10 records are *Unexcused Absence* in **W-HIST** (World History), one per school day from 2026-10-26 through 2026-11-06. The only gap is the weekend of 10-31 to 11-01. That points to a continuous unexcused absence streak of about two weeks.
+- **Source:** Each record traces back to the Ed-Fi `studentSectionAttendanceEvents` resource. The source system is Northridge SIS, which is fictional sample data. For example, the 11-06 record has ODS id `85be1301-13ab-47d8-8623-89efb2250c5b` and source id `SAMPLE-ATT-E4581D67`.
+- **Section:** `255901002_08-Traditional_WHIST_138_20262027`, in the 2026-2027 Fall Semester.
+
+If you want, I can pull the remaining 41 records, or the grade, assessment and discipline evidence for Clark.

@@ -19,7 +19,7 @@ tools haven't changed since.
 | --- | --- | --- |
 | Automated tests | 32 tests: every tool through an MCP client, checked against direct queries; scope for a teacher, a principal and the superintendent; input handling; lineage | ✅ 32/32 pass |
 | Lineage | The evidence behind each indicator for the demonstration students, checked against the indicator counts; scope; the server container with a signed-in teacher and principal; 6 prompts each in Claude Code and GitHub Copilot | ✅ Evidence matches the counts; 12/12 answers as expected; nothing outside the scope |
-| Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each of 5 roles; a full browser sign-in with PKCE | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401` |
+| Sign-in | 6 tests with real Keycloak tokens: metadata, no token, malformed, forged, other audience, expired, each of 5 roles; a full browser sign-in with PKCE; sign-in from Claude Code and VS Code | ✅ 6/6 pass; tokens other than Keycloak's for this server get `401`; both assistants signed in and used the tools as the teacher |
 | Database role | What `mcp_reader` can and can't do | ✅ Reads the data mart only |
 | HTTPS and Docker | The server container, called by an MCP client over Streamable HTTP with HTTPS | ✅ Works; refused without trusting the certificate |
 | AI assistants | 6 prompts each in Claude Code and GitHub Copilot, in three rounds: 3 a teacher would ask, 3 that try to get data outside the teacher's scope | ✅ 36/36 as expected; no data outside the scope in any answer |
@@ -285,6 +285,15 @@ records an inconsistency. Since then, `get_indicator_evidence` also returns
 per class missed and that the indicator counts days absent from at least one
 class.
 
+**VS Code, signed in:** VS Code with GitHub Copilot Chat in agent mode, with
+`server.crt` trusted by Windows and `.vscode/mcp.json` as in the
+[README](./README.md#connect-an-assistant). VS Code asked for the client ID
+(`edfi-mcp`), opened Keycloak, and after the teacher signed in, Copilot answered
+the same question with the teacher's at-risk list and Clark Vernon's absence
+records: "51 absence records, covering 44 distinct days absent. There is one
+record per class missed."
+([`vscode-sign-in.txt`](./test/evidence/2026-11-06-lineage/vscode-sign-in.txt)).
+
 **AI assistants:** [`test/assistants/run.py`](./test/assistants/run.py) with
 `PROMPT_SET=lineage`, headless, as in section 5: Claude Code (Sonnet 5.5) and
 the GitHub Copilot CLI (Claude Sonnet 5.5), against a local server with the demo
@@ -316,9 +325,7 @@ Copilot also pointed out two things in the data:
 
 ## Not tested yet
 
-- VS Code's own sign-in: Claude Code's was tested (section 7), and the flow
-  VS Code uses was checked with a script (section 2).
-- Other MCP clients (Claude Desktop, VS Code) beyond the two CLIs above; they
-  use the same transport.
+- Other MCP clients, such as Claude Desktop; they use the same transport and
+  sign-in.
 - Lineage for students outside the demonstration set, and lineage recorded when
   data is loaded rather than by a script.
