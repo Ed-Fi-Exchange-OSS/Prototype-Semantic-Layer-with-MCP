@@ -322,7 +322,8 @@ describe('early warning tools', () => {
                         WHERE studentkey = $1 AND disciplinedatekey <= $2) AS behavior`, [key, builtOn]);
                 const attendance = await evidence(key, 'attendance');
                 // Attendance evidence is one record per class; the indicator counts days
-                assert.equal(new Set(attendance.records.map((r: Row) => r.date)).size, direct.attendance, key);
+                assert.equal(attendance.days, direct.attendance, key);
+                assert.equal(new Set(attendance.records.map((r: Row) => r.date)).size, attendance.days, key);
                 for (const indicator of ['course_performance', 'assessments', 'behavior']) {
                     const result = await evidence(key, indicator);
                     assert.equal(result.total, direct[indicator], `${key} ${indicator}`);

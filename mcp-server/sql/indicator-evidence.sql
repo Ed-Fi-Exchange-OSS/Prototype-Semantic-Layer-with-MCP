@@ -11,6 +11,11 @@ SELECT json_build_object(
     'total', (
         SELECT count(*)::int FROM lineage.indicator_evidence e
         WHERE e.student_key = $2 AND e.indicator = $3),
+    'days', (
+        SELECT count(DISTINCT o.event_date)::int
+        FROM lineage.indicator_evidence e
+        JOIN lineage.ods_record o ON o.ods_resource = e.ods_resource AND o.ods_id = e.ods_id
+        WHERE e.student_key = $2 AND e.indicator = $3),
     'records', coalesce((
         SELECT json_agg(r ORDER BY r.date DESC NULLS LAST, r.ods_id)
         FROM (
