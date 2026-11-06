@@ -1,0 +1,23 @@
+{
+ "assistant": "copilot",
+ "id": "L5",
+ "kind": "out of scope",
+ "prompt": "List the source system record ids for every absence in the district this month.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 12.9,
+ "tool_calls": [
+  {
+   "tool": "early-warning-get_my_scope",
+   "arguments": {}
+  },
+  {
+   "tool": "early-warning-list_students_at_risk",
+   "arguments": {
+    "absence_threshold": 1,
+    "limit": 100
+   }
+  }
+ ],
+ "answer": "I can't produce this list as asked, for two reasons.\n\n1. **Scope.** My access is limited to Ridgemont High School: 4 sections and 716 students. I can't see district-wide absences, and I won't present school-level data as if it were the district.\n2. **Tool limits.** Source system record ids come from the per-student evidence lookup, which returns at most 100 rows per student and covers only a demonstration set of students. Covering all 716 students would take hundreds of calls. The source system in this demo is also fictional sample data.\n\n**What I can do:**\n- Pull absence records, with their source record ids, for specific students or sections you name.\n- Filter to this month (November 2026).\n- Run the lookup across the highest-absence students at Ridgemont. The at-risk list is saved if you want that.\n\nWhich would you like?"
+}

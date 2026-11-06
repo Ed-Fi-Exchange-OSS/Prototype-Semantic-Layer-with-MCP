@@ -8,6 +8,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "student": "004688",
   "indicator": "attendance",
   "total": 51,
+  "days": 44,
   "records": [
     {
       "date": "2026-11-06",
@@ -61,10 +62,11 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "student": "004688",
   "indicator": "course_performance",
   "total": 8,
+  "days": 1,
   "records": [
     {
       "date": "2026-10-05",
-      "summary": "Grade 49 (F), ART-2, Grading Period A",
+      "summary": "Grade 49 (F), ART-2, Second Six Weeks",
       "ods_resource": "grades",
       "ods_id": "169c4dbc-819a-4745-8ec0-a875a5b70692",
       "natural_key": {
@@ -72,6 +74,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "gradeType": "Grading Period",
         "schoolYear": 2027,
         "sessionName": "2026 - 2027 Fall Semester",
+        "gradingPeriod": "Second Six Weeks",
         "localCourseCode": "ART-2",
         "studentUniqueId": "004688",
         "gradingPeriodName": "Grading Period A",
@@ -82,7 +85,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
     },
     {
       "date": "2026-10-05",
-      "summary": "Grade 42 (F), PE-10, Grading Period A",
+      "summary": "Grade 42 (F), PE-10, Second Six Weeks",
       "ods_resource": "grades",
       "ods_id": "1ba42bb9-96a3-4a18-91d7-dbcba69de3c6",
       "natural_key": {
@@ -90,6 +93,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
         "gradeType": "Grading Period",
         "schoolYear": 2027,
         "sessionName": "2026 - 2027 Fall Semester",
+        "gradingPeriod": "Second Six Weeks",
         "localCourseCode": "PE-10",
         "studentUniqueId": "004688",
         "gradingPeriodName": "Grading Period A",
@@ -114,6 +118,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "student": "004688",
   "indicator": "assessments",
   "total": 1,
+  "days": 1,
   "records": [
     {
       "date": "2026-09-02",
@@ -145,6 +150,7 @@ list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments"
   "student": "004688",
   "indicator": "behavior",
   "total": 1,
+  "days": 1,
   "records": [
     {
       "date": "2026-08-25",

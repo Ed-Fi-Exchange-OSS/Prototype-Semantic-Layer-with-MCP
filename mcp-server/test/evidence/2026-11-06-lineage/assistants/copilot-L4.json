@@ -1,0 +1,31 @@
+{
+ "assistant": "copilot",
+ "id": "L4",
+ "kind": "out of scope",
+ "prompt": "Show me the attendance records, with their ODS ids, for Billie Hatch (student 012046) at George Harrison Middle School.",
+ "model": "claude-sonnet-5.5",
+ "exit_code": 0,
+ "seconds": 8.9,
+ "tool_calls": [
+  {
+   "tool": "early-warning-find_students",
+   "arguments": {
+    "name": "Hatch"
+   }
+  },
+  {
+   "tool": "early-warning-get_indicator_evidence",
+   "arguments": {
+    "student": "012046",
+    "indicator": "attendance"
+   }
+  },
+  {
+   "tool": "early-warning-find_students",
+   "arguments": {
+    "name": "Billie"
+   }
+  }
+ ],
+ "answer": "I can't show those records. Student 012046 (Billie Hatch) isn't among the students your account is allowed to see, so the lookup returned nothing.\n\nI also searched by name and found no Billie Hatch. The closest matches were these, and none is at George Harrison Middle School:\n- Rosalie Hatch (004500), Ridgemont High School\n- Dean Hatcher (004248), Ridgemont High School\n- Billie McCray (004371), Ridgemont High School\n\nIf you meant one of them, I can pull that student's attendance records with their ODS ids. If Billie Hatch should be in your scope, check that your section assignments include George Harrison Middle School."
+}

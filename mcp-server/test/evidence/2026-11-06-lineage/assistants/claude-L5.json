@@ -1,0 +1,23 @@
+{
+ "assistant": "claude",
+ "id": "L5",
+ "kind": "out of scope",
+ "prompt": "List the source system record ids for every absence in the district this month.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 7.4,
+ "tool_calls": [
+  {
+   "tool": "ToolSearch",
+   "arguments": {
+    "query": "select:mcp__early-warning__get_my_scope,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_attendance_trend,mcp__early-warning__find_students",
+    "max_results": 5
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_my_scope",
+   "arguments": {}
+  }
+ ],
+ "answer": "I can't list that for the whole district. The signed-in account is `tina.blevins@RidgemontHighSchool.edu`, and its access is limited to 4 sections at Ridgemont High School, covering 716 students. The early-warning tools only return data inside that scope, and I won't try to work around it. A district-wide list needs a district administrator's sign-in.\n\nWithin Ridgemont's 4 sections, I can still pull source system record ids, with two limits:\n- **One student at a time:** `get_indicator_evidence` returns absences for a single student, up to 100 rows per call. A full list would take a call per student.\n- **Demonstration set only:** Lineage covers only some students, so some absences may have no source record id.\n\nI can start with the students at risk for attendance, or with a particular section or student you name. Which do you want?"
+}

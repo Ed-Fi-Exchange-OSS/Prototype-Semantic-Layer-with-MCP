@@ -1,0 +1,38 @@
+{
+ "assistant": "claude",
+ "id": "L3",
+ "kind": "normal",
+ "prompt": "Show me the records behind Vernon Henderson's early warning flags.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 12.5,
+ "tool_calls": [
+  {
+   "tool": "ToolSearch",
+   "arguments": {
+    "query": "select:mcp__early-warning__find_students,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_student_summary",
+    "max_results": 5
+   }
+  },
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Vernon Henderson"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004729"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "attendance"
+   }
+  }
+ ],
+ "answer": "I can't show the underlying records for Vernon Henderson (student 004729, tenth grade, Ridgemont High School). Record-level lineage only covers a demonstration set of students, and he isn't in it. His summary lists no indicators with evidence, and the attendance evidence lookup returned 0 records. That doesn't mean the records don't exist, only that the lineage tables don't link them for him.\n\nWhat the summary does show for his flags:\n\n- **Attendance:** 5 days absent out of 50 instructional days, a 10% absence rate. 1 was excused, 4 were unexcused, and he has no tardies.\n- **Course performance:** He has an F in all 8 courses for the Second Six Weeks, with scores from 23 to 36.\n  - World History Studies 23\n  - Languages Other Than English Level I 26\n  - Computer Lab, Grade 10 27\n  - Biology 29\n  - Humanities 31\n  - Intermediate Art 32\n  - Algebra II 33\n  - Physical Education, Grades 9-12 36\n- **Assessments:** STATE Algebra II on 2026-09-02, score 6, rated Well Below Basic.\n- **Behavior:** No discipline actions are on file.\n\nThese are summary figures only. They don't give the Ed-Fi ODS resource ids or source-system record ids.\n\nI only checked attendance. The tool describes the other three indicators the same way, but I didn't query them.\n\nIf you want the underlying records, I can look at a student who is in the lineage demonstration set, such as one of the students flagged by `list_students_at_risk` that has evidence available. I could also check `sql/indicator-evidence.sql` to see how the demonstration set is chosen."
+}
