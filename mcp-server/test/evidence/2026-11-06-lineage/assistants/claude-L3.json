@@ -5,12 +5,12 @@
  "prompt": "Show me the records behind Vernon Henderson's early warning flags.",
  "model": "claude-sonnet-5-5",
  "exit_code": 0,
- "seconds": 12.5,
+ "seconds": 15.5,
  "tool_calls": [
   {
    "tool": "ToolSearch",
    "arguments": {
-    "query": "select:mcp__early-warning__find_students,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_student_summary",
+    "query": "select:mcp__early-warning__find_students,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_student_summary,mcp__early-warning__get_my_scope",
     "max_results": 5
    }
   },
@@ -32,7 +32,21 @@
     "student": "004729",
     "indicator": "attendance"
    }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "course_performance"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "assessments"
+   }
   }
  ],
- "answer": "I can't show the underlying records for Vernon Henderson (student 004729, tenth grade, Ridgemont High School). Record-level lineage only covers a demonstration set of students, and he isn't in it. His summary lists no indicators with evidence, and the attendance evidence lookup returned 0 records. That doesn't mean the records don't exist, only that the lineage tables don't link them for him.\n\nWhat the summary does show for his flags:\n\n- **Attendance:** 5 days absent out of 50 instructional days, a 10% absence rate. 1 was excused, 4 were unexcused, and he has no tardies.\n- **Course performance:** He has an F in all 8 courses for the Second Six Weeks, with scores from 23 to 36.\n  - World History Studies 23\n  - Languages Other Than English Level I 26\n  - Computer Lab, Grade 10 27\n  - Biology 29\n  - Humanities 31\n  - Intermediate Art 32\n  - Algebra II 33\n  - Physical Education, Grades 9-12 36\n- **Assessments:** STATE Algebra II on 2026-09-02, score 6, rated Well Below Basic.\n- **Behavior:** No discipline actions are on file.\n\nThese are summary figures only. They don't give the Ed-Fi ODS resource ids or source-system record ids.\n\nI only checked attendance. The tool describes the other three indicators the same way, but I didn't query them.\n\nIf you want the underlying records, I can look at a student who is in the lineage demonstration set, such as one of the students flagged by `list_students_at_risk` that has evidence available. I could also check `sql/indicator-evidence.sql` to see how the demonstration set is chosen."
+ "answer": "I couldn't pull record-level evidence for Vernon Henderson (Tenth grade, Ridgemont High School, key 004729). The evidence tool only has records, with their Ed-Fi ODS ids and change lineage, for a demonstration set of students, and he isn't in it. I checked attendance, course performance and assessments, and each returned zero records. The tool says this doesn't mean the underlying records don't exist. I didn't check behavior, because his summary shows no discipline actions.\n\nHis summary does show what sits behind the flags:\n\n**Attendance** (50 instructional days)\n- 5 days absent, a 10% absence rate.\n- 1 absence is excused and 4 are unexcused.\n- No tardies.\n\n**Course performance** (Second Six Weeks)\nHe is failing all 8 courses:\n\n| Course | Grade |\n|---|---|\n| Algebra II | 33 (F) |\n| Biology | 29 (F) |\n| Computer Lab, Grade 10 | 27 (F) |\n| Humanities | 31 (F) |\n| Intermediate Art | 32 (F) |\n| Languages Other Than English Level I | 26 (F) |\n| Physical Education, Grades 9-12 | 36 (F) |\n| World History Studies | 23 (F) |\n\n**Assessments**\n- STATE Algebra II on 2026-09-02: score 6, Well Below Basic.\n\n**Behavior and programs**\n- No discipline actions and no program enrollments are recorded.\n\nFailing every course at once is unusual. It could be real, but it could also be a data problem, such as grades not yet posted or a feed error. To check, the source records would have to come from the SIS or gradebook, outside this tool."
 }

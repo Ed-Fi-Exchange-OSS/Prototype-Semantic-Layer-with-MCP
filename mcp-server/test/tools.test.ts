@@ -284,21 +284,53 @@ describe('early warning tools', () => {
             }
         });
 
-        test('each record has a date, an ODS id and the sample source system', async () => {
+        test('each record has a date, an ODS id and its history of changes', async () => {
             const result = await evidence(demo[0], 'attendance');
             assert.equal(result.student, demo[0]);
             assert.ok(result.total > 0 && result.records.length === result.total);
+            const now = Date.now() / 1000;
             for (const r of result.records) {
                 assert.match(r.date, /^\d{4}-\d{2}-\d{2}$/);
                 assert.ok(r.date.replaceAll('-', '') <= builtOn, r.date);
                 assert.equal(r.ods_resource, 'studentSectionAttendanceEvents');
                 assert.match(r.ods_id, /^[0-9a-f-]{36}$/);
                 assert.equal(r.natural_key.studentUniqueId, demo[0]);
-                assert.match(r.source_system, /fictional sample/);
-                assert.match(r.source_record_id, /^SAMPLE-ATT-[0-9A-F]{8}$/);
+                // _lineage as in option 2 of the Ed-Fi lineage proposal: created by the SIS, oldest first
+                assert.ok(r._lineage.length > 0, r.ods_id);
+                assert.match(r._lineage[0].applicationName, /^Northridge SIS \(fictional sample\)$/);
+                const times = r._lineage.map((c: Row) => c.timestamp);
+                for (const t of times) {
+                    assert.ok(Number.isInteger(t) && t <= now, `${r.ods_id} ${t}`);
+                }
+                assert.deepEqual(times, [...times].sort((a, b) => a - b), 'oldest change first');
+                assert.ok(new Date(times[0] * 1000).toISOString().slice(0, 10) >= r.date, r.ods_id);
             }
             const dates = result.records.map((r: Row) => r.date);
             assert.deepEqual(dates, [...dates].sort().reverse(), 'newest first');
+        });
+
+        test('each indicator\'s records come from the application that owns them', async () => {
+            const owners: Record<string, RegExp> = {
+                attendance: /^Northridge SIS/,
+                course_performance: /^Northridge Gradebook/,
+                assessments: /^State Assessment Vendor/,
+                behavior: /^Northridge SIS/,
+            };
+            let corrected = 0;
+            for (const key of demo) {
+                for (const [indicator, owner] of Object.entries(owners)) {
+                    for (const r of (await evidence(key, indicator)).records) {
+                        assert.match(r._lineage[0].applicationName, owner, `${key} ${indicator}`);
+                        if (r._lineage.length > 1) {
+                            // Only excused absences change later, by the attendance office
+                            assert.match(r.summary, /^Excused Absence/, r.ods_id);
+                            assert.match(r._lineage[1].applicationName, /^Ridgemont Attendance Office/);
+                            corrected++;
+                        }
+                    }
+                }
+            }
+            assert.ok(corrected > 0, 'some records have more than one change');
         });
 
         test('the evidence matches the indicator counts in the data mart', async () => {

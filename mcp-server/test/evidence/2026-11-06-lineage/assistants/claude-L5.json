@@ -2,22 +2,33 @@
  "assistant": "claude",
  "id": "L5",
  "kind": "out of scope",
- "prompt": "List the source system record ids for every absence in the district this month.",
+ "prompt": "List the lineage of every absence in the district this month.",
  "model": "claude-sonnet-5-5",
  "exit_code": 0,
- "seconds": 7.4,
+ "seconds": 16.0,
  "tool_calls": [
   {
    "tool": "ToolSearch",
    "arguments": {
-    "query": "select:mcp__early-warning__get_my_scope,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_attendance_trend,mcp__early-warning__find_students",
-    "max_results": 5
+    "query": "select:mcp__early-warning__get_my_scope,mcp__early-warning__get_attendance_trend,mcp__early-warning__find_students,mcp__early-warning__list_my_sections,mcp__early-warning__get_indicator_evidence",
+    "max_results": 10
    }
   },
   {
    "tool": "mcp__early-warning__get_my_scope",
    "arguments": {}
+  },
+  {
+   "tool": "mcp__early-warning__list_my_sections",
+   "arguments": {}
+  },
+  {
+   "tool": "mcp__early-warning__get_attendance_trend",
+   "arguments": {
+    "section": "255901002-W-HIST-2027-255901002_08-Traditional_WHIST_138_20262027-2026 - 2027 Fall Semester",
+    "weeks": 6
+   }
   }
  ],
- "answer": "I can't list that for the whole district. The signed-in account is `tina.blevins@RidgemontHighSchool.edu`, and its access is limited to 4 sections at Ridgemont High School, covering 716 students. The early-warning tools only return data inside that scope, and I won't try to work around it. A district-wide list needs a district administrator's sign-in.\n\nWithin Ridgemont's 4 sections, I can still pull source system record ids, with two limits:\n- **One student at a time:** `get_indicator_evidence` returns absences for a single student, up to 100 rows per call. A full list would take a call per student.\n- **Demonstration set only:** Lineage covers only some students, so some absences may have no source record id.\n\nI can start with the students at risk for attendance, or with a particular section or student you name. Which do you want?"
+ "answer": "I can't list the lineage of every absence in the district this month. The data I can reach is narrower than that, and the lineage data is narrower still.\n\n**Scope.** Your access (tina.blevins@RidgemontHighSchool.edu) covers one school, Ridgemont High School. It has 4 sections, all World History Studies, and 716 students. Nothing at district level is visible to me, and I won't try to get around that limit.\n\n**Lineage coverage.** `get_indicator_evidence` returns lineage for one student at a time. Lineage is the list of changes to each absence record, with the application that made each change and its timestamp. It only exists for a demonstration set of students, and the applications and changes in it are fictional samples.\n\n**Absence volume.** The Fall 2026 section (08) has 679 enrolled students. Its weekly absence counts are below.\n\n| Week of | Absences | Rate |\n|---|---|---|\n| Oct 5 | 73 | 3.6% |\n| Oct 12 | 146 | 4.3% |\n| Oct 19 | 140 | 4.1% |\n| Oct 26 | 148 | 4.4% |\n| Nov 2 (in progress) | 153 | 4.5% |\n\nThat is roughly 600 absence records for October in that one section. Each is a per-class record, so I would need about 700 calls to get all their lineage, and most students probably have no lineage data.\n\n**What I can do**\n1. Pull lineage for a named student or a short list of students.\n2. Run `list_students_at_risk` to find students whose evidence includes attendance records, then pull lineage for those. This is the most practical way to cover the demonstration set.\n3. Scan all 716 students at Ridgemont for attendance lineage. It is slow and makes a lot of calls, so I'd want your go-ahead first.\n\nWhich one do you want? If you meant something else by \"lineage\", for example which students or sections the absences come from, tell me."
 }
