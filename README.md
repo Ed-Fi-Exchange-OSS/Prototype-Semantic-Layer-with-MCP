@@ -12,6 +12,9 @@ which were further elucidated in the [Ed-Fi and AI Special Interest Group
 
 ## Contents
 
+- [`docs/PRD.md`](./docs/PRD.md): product requirements for the early warning
+  proof of concept.
+- [`docs/adr/`](./docs/adr/): architecture decisions.
 - [`datamart/`](./datamart/README.md): the semantic layer, a PostgreSQL data
   mart for the early warning use case, built from the Northridge sample data.
 
