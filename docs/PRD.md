@@ -93,9 +93,9 @@ community can adapt to build its own semantic layers and MCP servers.
   users to the students they may see. Refreshed from the ODS on demand.
 - **MCP server:** the only way the AI application reaches the data. It offers
   a few curated tools and applies each user's access.
-- **Identity:** Ed-Fi Admin App user management, for sign-in through OAuth
-  (later phase). Until then, a configured demo user stands in for the
-  signed-in educator.
+- **Identity:** an OAuth authorization server (Keycloak) where educators sign
+  in. A configured demo user can stand in for the signed-in educator, for
+  development.
 - **AI application:** any MCP client, such as Claude Code, Claude Desktop or
   GitHub Copilot. Treated as an untrusted client.
 - **Lineage records:** sidecar tables that link semantic layer records to their
@@ -104,7 +104,7 @@ community can adapt to build its own semantic layers and MCP servers.
 ```text
 AI application (MCP client)
         |  curated MCP tools
-MCP server  <-- identity (demo user, then Admin App OAuth)
+MCP server  <-- identity (sign-in through Keycloak, or a demo user)
         |  fixed, read-only queries
 Semantic layer (data mart, user-to-student access, lineage)
         |  refresh
@@ -162,14 +162,17 @@ Ed-Fi ODS (Northridge sample data)
 - **FR-TREND-1:** The system SHALL show absences per week over a given number
   of weeks, for one student or for a section.
 
-### Authentication and authorization (later phases)
+### Authentication and authorization
 
 - **FR-AUTH-1:** The MCP server SHALL authenticate users with OAuth access
-  tokens through Ed-Fi Admin App user management.
-- **FR-AUTH-2:** Admin App users SHALL be linked to Ed-Fi staff records, and
+  tokens issued for it by the authorization server where they sign in.
+- **FR-AUTH-2:** Signed-in users SHALL be linked to Ed-Fi staff records, and
   through them to their roles, by email address.
 - **FR-AUTH-3:** Access SHALL follow the role: a teacher sees their sections'
   students; a principal, their school; a superintendent, their district.
+- **FR-AUTH-4:** An MCP client SHALL be able to find where users sign in from
+  the MCP server itself, and a request without a valid token SHALL get no
+  data.
 
 ### Lineage (later phases)
 
@@ -248,7 +251,7 @@ Ed-Fi ODS (Northridge sample data)
 | Sample ODS | Operational data (Northridge), moved to the current school year | PostgreSQL in Docker | Source records |
 | Semantic layer | Early warning dimensions and facts, user-to-student access, lineage | PostgreSQL in Docker, refreshed from the ODS | Derived data, access mappings, lineage records |
 | MCP server | Curated tools, user resolution, access enforcement | Container next to the semantic layer, Streamable HTTP | None |
-| Identity | User sign-in and roles (later phase) | Ed-Fi Admin App | Users, roles, links to staff |
+| Identity | User sign-in | Keycloak in Docker | Users and their verified emails |
 | AI application | Asks questions on the user's behalf | Any MCP client | None |
 
 The implementation decisions are recorded as architecture decision records in
@@ -260,8 +263,8 @@ The implementation decisions are recorded as architecture decision records in
 2. Design of the MCP tools and the server.
 3. Tools that query the semantic layer, for a configured demo user, without
    sign-in.
-4. Sign-in through Ed-Fi Admin App user management with OAuth.
-   1. Admin App users linked to staff roles, with access for each role.
+4. Sign-in with OAuth, through Keycloak.
+   1. Signed-in users linked to staff roles, with access for each role.
 5. Design of the lineage records, populated by hand.
 6. Lineage reported by the tools.
 

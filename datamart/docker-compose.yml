@@ -46,6 +46,10 @@ services:
       PGDATABASE: edfi_datamart
       PGUSER: mcp_reader
       PGPASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
+      # Sign-in through Keycloak; set OAUTH_ISSUER to empty in .env to use the demo user instead.
+      OAUTH_ISSUER: ${OAUTH_ISSUER-https://localhost:8443/realms/edfi}
+      OAUTH_JWKS_URL: http://keycloak:8080/realms/edfi/protocol/openid-connect/certs
+      MCP_RESOURCE_URL: https://localhost:${MCP_PORT:-3000}/mcp
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-tina.blevins@RidgemontHighSchool.edu}
       TLS_CERT_FILE: /certs/server.crt
       TLS_KEY_FILE: /certs/server.key
@@ -58,6 +62,49 @@ services:
         condition: service_healthy
       mcp-cert:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_started
+
+  # Sign-in for the MCP server: Keycloak with an "edfi" realm like Ed-Fi Admin App's, on
+  # https://localhost:8443 (same self-signed certificate). Port 8080 (plain HTTP) is only reachable inside the
+  # Docker network.
+  keycloak:
+    profiles: [mcp]
+    image: quay.io/keycloak/keycloak:26.1.5
+    command:
+      - start-dev
+      - --import-realm
+      - --hostname=https://localhost:${KEYCLOAK_PORT:-8443}
+      - --hostname-backchannel-dynamic=true
+      - --https-port=8443
+      - --https-certificate-file=/certs/server.crt
+      - --https-certificate-key-file=/certs/server.key
+      - --http-enabled=true
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
+    volumes:
+      - ../mcp-server/certs:/certs:ro
+      - ../mcp-server/keycloak/realm-edfi.json:/opt/keycloak/data/import/realm-edfi.json:ro
+    ports:
+      - "${KEYCLOAK_PORT:-8443}:8443"
+    depends_on:
+      mcp-cert:
+        condition: service_completed_successfully
+
+  # Creates the demo users (a teacher, a principal, the superintendent) once Keycloak is up.
+  keycloak-users:
+    profiles: [mcp]
+    image: quay.io/keycloak/keycloak:26.1.5
+    entrypoint: ["bash", "/scripts/create-demo-users.sh"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?Set DEMO_USER_PASSWORD in .env}
+    volumes:
+      - ../mcp-server/keycloak/create-demo-users.sh:/scripts/create-demo-users.sh:ro
+    depends_on:
+      - keycloak
 
 volumes:
   datamart-db:
