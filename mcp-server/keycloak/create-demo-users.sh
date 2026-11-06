@@ -5,8 +5,9 @@
 # See the LICENSE and NOTICES files in the project root for more information.
 
 # Creates the demo users in the Keycloak realm "edfi", with the emails of Northridge staff: a teacher, a
-# principal and the superintendent. Runs in the Keycloak image (see datamart/docker-compose.yml), once
-# Keycloak is up. The users' password comes from DEMO_USER_PASSWORD and is set again on every run.
+# principal, an assistant principal, the superintendent and the district administrator. Runs in the Keycloak
+# image (see datamart/docker-compose.yml), once Keycloak is up. The users' password comes from
+# DEMO_USER_PASSWORD and is set again on every run.
 
 set -euo pipefail
 
@@ -36,4 +37,6 @@ create_user() {
 
 create_user tina.blevins@RidgemontHighSchool.edu Tina Blevins
 create_user carmen.helms@RidgemontHighSchool.edu Carmen Helms
+create_user sheryl.horton@RidgemontHighSchool.edu Sheryl Horton
 create_user superintendent@NorthridgeISD.edu Northridge Superintendent
+create_user sysadmin@NorthridgeISD.edu Northridge Administrator
