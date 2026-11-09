@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { after, before, describe, test } from 'node:test';
+import { after, before, describe, mock, test } from 'node:test';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { generateKeyPair, SignJWT } from 'jose';
@@ -107,11 +107,23 @@ describe('sign-in', { skip: password ? false : 'DEMO_USER_PASSWORD is not set' }
             .setIssuer(issuer).setAudience(resource).setIssuedAt().setExpirationTime('5m')
             .sign(privateKey);
         const otherAudience = await token(teacher, 'admin-cli');
-        for (const [name, value] of [['malformed', 'not-a-token'], ['forged', forged],
-            ['another audience', otherAudience]]) {
-            const response = await post({ Authorization: `Bearer ${value}` });
-            assert.equal(response.status, 401, name);
-            assert.match(response.headers.get('www-authenticate') ?? '', /error="invalid_token"/, name);
+        const log = mock.method(console, 'error', () => {});
+        try {
+            for (const [name, value, reason] of [['malformed', 'not-a-token', /ERR_JWS_INVALID/],
+                ['forged', forged, /ERR_JWKS_NO_MATCHING_KEY/],
+                ['another audience', otherAudience, /ERR_JWT_CLAIM_VALIDATION_FAILED: .*"aud"/]] as const) {
+                const response = await post({ Authorization: `Bearer ${value}` });
+                assert.equal(response.status, 401, name);
+                const challenge = response.headers.get('www-authenticate') ?? '';
+                assert.match(challenge, /error="invalid_token"/, name);
+                // The server logs why, but the response doesn't say, and neither shows the token
+                const logged = String(log.mock.calls.at(-1)?.arguments[0]);
+                assert.match(logged, reason, name);
+                assert.ok(!logged.includes(value) && !challenge.includes(value), name);
+                assert.doesNotMatch(challenge, /aud|ERR_/, name);
+            }
+        } finally {
+            log.mock.restore();
         }
     });
 

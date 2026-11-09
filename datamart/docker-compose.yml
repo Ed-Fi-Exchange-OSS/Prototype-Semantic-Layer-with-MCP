@@ -47,16 +47,17 @@ services:
       PGUSER: mcp_reader
       PGPASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
       # Sign-in through Keycloak; set OAUTH_ISSUER to empty in .env to use the demo user instead.
+      # The issuer and the resource URL must match realm-edfi.json, so the ports are fixed.
       OAUTH_ISSUER: ${OAUTH_ISSUER-https://localhost:8443/realms/edfi}
       OAUTH_JWKS_URL: http://keycloak:8080/realms/edfi/protocol/openid-connect/certs
-      MCP_RESOURCE_URL: https://localhost:${MCP_PORT:-3000}/mcp
+      MCP_RESOURCE_URL: https://localhost:3000/mcp
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-tina.blevins@RidgemontHighSchool.edu}
       TLS_CERT_FILE: /certs/server.crt
       TLS_KEY_FILE: /certs/server.key
     volumes:
       - ../mcp-server/certs:/certs:ro
     ports:
-      - "${MCP_PORT:-3000}:3000"
+      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -74,7 +75,7 @@ services:
     command:
       - start-dev
       - --import-realm
-      - --hostname=https://localhost:${KEYCLOAK_PORT:-8443}
+      - --hostname=https://localhost:8443
       - --hostname-backchannel-dynamic=true
       - --https-port=8443
       - --https-certificate-file=/certs/server.crt
@@ -87,7 +88,7 @@ services:
       - ../mcp-server/certs:/certs:ro
       - ../mcp-server/keycloak/realm-edfi.json:/opt/keycloak/data/import/realm-edfi.json:ro
     ports:
-      - "${KEYCLOAK_PORT:-8443}:8443"
+      - "8443:8443"
     depends_on:
       mcp-cert:
         condition: service_completed_successfully
