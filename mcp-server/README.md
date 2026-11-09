@@ -30,8 +30,10 @@ mart tables it used.
 
 ## Run it
 
-Build the data mart first (see [`datamart/`](../datamart/README.md)), with
-`MCP_READER_PASSWORD` set in `datamart/.env`. Then, from `datamart/`:
+Build the data mart first (see [`datamart/`](../datamart/README.md)). The
+data mart only needs `POSTGRES_PASSWORD` and `MCP_READER_PASSWORD` in
+`datamart/.env`; sign-in also needs `KEYCLOAK_ADMIN_PASSWORD` (Keycloak's
+`admin` user) and `DEMO_USER_PASSWORD` (the demo users). Then, from `datamart/`:
 
 ```bash
 docker compose --profile mcp up -d --build

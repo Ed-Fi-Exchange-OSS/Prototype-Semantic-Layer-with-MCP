@@ -72,6 +72,16 @@ services:
   keycloak:
     profiles: [mcp]
     image: quay.io/keycloak/keycloak:26.1.5
+    # The passwords are checked here rather than with ":?", which Compose applies to every service, so the
+    # data mart builds without them.
+    entrypoint:
+      - bash
+      - -c
+      - >-
+        [ -n "$$KC_BOOTSTRAP_ADMIN_PASSWORD" ]
+        || { echo "Set KEYCLOAK_ADMIN_PASSWORD in datamart/.env" >&2; exit 1; };
+        exec /opt/keycloak/bin/kc.sh "$$@"
+      - kc.sh
     command:
       - start-dev
       - --import-realm
@@ -83,7 +93,7 @@ services:
       - --http-enabled=true
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-}
     volumes:
       - ../mcp-server/certs:/certs:ro
       - ../mcp-server/keycloak/realm-edfi.json:/opt/keycloak/data/import/realm-edfi.json:ro
@@ -100,8 +110,8 @@ services:
     entrypoint: ["bash", "/scripts/create-demo-users.sh"]
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD in .env}
-      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?Set DEMO_USER_PASSWORD in .env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-}
     volumes:
       - ../mcp-server/keycloak/create-demo-users.sh:/scripts/create-demo-users.sh:ro
     depends_on:
