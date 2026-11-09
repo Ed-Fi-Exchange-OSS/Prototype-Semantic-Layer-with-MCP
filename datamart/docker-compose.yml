@@ -5,6 +5,8 @@
 
 # PostgreSQL server for the sample ODS and the data mart, and the MCP server (profile "mcp"). Set the
 # passwords in a .env file next to this file (see .env.example).
+# Every port is published on 127.0.0.1 only: the demo is meant to be used from this machine, not from
+# others on the same network.
 services:
   db:
     image: postgres:16-alpine
@@ -12,7 +14,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       MCP_READER_PASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
     ports:
-      - "${DATAMART_DB_PORT:-5440}:5432"
+      - "127.0.0.1:${DATAMART_DB_PORT:-5440}:5432"
     volumes:
       - datamart-db:/var/lib/postgresql/data
       - ./sql:/sql:ro
@@ -57,7 +59,7 @@ services:
     volumes:
       - ../mcp-server/certs:/certs:ro
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -98,7 +100,7 @@ services:
       - ../mcp-server/certs:/certs:ro
       - ../mcp-server/keycloak/realm-edfi.json:/opt/keycloak/data/import/realm-edfi.json:ro
     ports:
-      - "8443:8443"
+      - "127.0.0.1:8443:8443"
     depends_on:
       mcp-cert:
         condition: service_completed_successfully

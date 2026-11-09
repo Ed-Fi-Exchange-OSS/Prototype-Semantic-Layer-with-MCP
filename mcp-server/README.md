@@ -45,6 +45,10 @@ start creates a self-signed certificate for `localhost` in
 server connects to the data mart as `mcp_reader`, a role that can only read the
 `analytics` schema.
 
+The server, Keycloak and the database only accept connections from this
+machine (Docker publishes their ports on `127.0.0.1`), and Keycloak locks a
+user for a while after 5 wrong passwords.
+
 ### Sign-in off
 
 To run without Keycloak, set `OAUTH_ISSUER=` (empty) in `datamart/.env` and
