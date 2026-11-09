@@ -9,7 +9,7 @@ are in [docs/PRD.md](../docs/PRD.md) and the architecture decisions in
 
 Educators sign in through Keycloak (OAuth), and the server takes the user from
 the token's verified email. For development, sign-in can be turned off so that a
-demo user, set with `DEMO_USER_EMAIL`, stands in for the signed-in educator.
+demo user stands in for the signed-in educator (see [Sign-in off](#sign-in-off)).
 
 What was tested and the results, including runs with Claude Code and GitHub
 Copilot, are in [TESTING.md](./TESTING.md).
@@ -30,8 +30,10 @@ mart tables it used.
 
 ## Run it
 
-Build the data mart first (see [`datamart/`](../datamart/README.md)), with
-`MCP_READER_PASSWORD` set in `datamart/.env`. Then, from `datamart/`:
+Build the data mart first (see [`datamart/`](../datamart/README.md)). The
+data mart only needs `POSTGRES_PASSWORD` and `MCP_READER_PASSWORD` in
+`datamart/.env`; sign-in also needs `KEYCLOAK_ADMIN_PASSWORD` (Keycloak's
+`admin` user) and `DEMO_USER_PASSWORD` (the demo users). Then, from `datamart/`:
 
 ```bash
 docker compose --profile mcp up -d --build
@@ -43,8 +45,16 @@ start creates a self-signed certificate for `localhost` in
 server connects to the data mart as `mcp_reader`, a role that can only read the
 `analytics` schema.
 
-To choose another demo user, set `DEMO_USER_EMAIL` in `datamart/.env` to a staff
-email from the data mart. What the user sees follows their role:
+The server, Keycloak and the database only accept connections from this
+machine (Docker publishes their ports on `127.0.0.1`), and Keycloak locks a
+user for a while after 5 wrong passwords.
+
+### Sign-in off
+
+To run without Keycloak, set `OAUTH_ISSUER=` (empty) in `datamart/.env` and
+start the server again. Every request then runs as the demo user in
+`DEMO_USER_EMAIL`, a staff email from the data mart. `DEMO_USER_EMAIL` has no
+effect with sign-in on. What the user sees follows their role:
 
 - a teacher, the students in their sections (for example
   `tina.blevins@RidgemontHighSchool.edu`);
@@ -112,9 +122,21 @@ node dist/src/index.js --stdio
 ```
 
 The server reads the standard `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER` and
-`PGPASSWORD` variables (or `DATAMART_DATABASE_URL`) and `DEMO_USER_EMAIL`.
+`PGPASSWORD` variables (or `DATAMART_DATABASE_URL`), and for sign-in:
+
+| Variable | What it sets |
+| --- | --- |
+| `OAUTH_ISSUER` | The issuer that tokens must come from, `https://localhost:8443/realms/edfi` in Docker. Empty or unset: sign-in off, and `DEMO_USER_EMAIL` is the user |
+| `MCP_RESOURCE_URL` | This server's URL, which tokens must carry as audience; `https://localhost:<PORT>/mcp` by default |
+| `OAUTH_JWKS_URL` | Where to read the issuer's signing keys; the issuer's by default (in Docker, Keycloak's internal address) |
+
+The server logs why it rejects a token (for example a wrong issuer or
+audience) but doesn't send the reason to the client.
 
 `npm test` runs every tool through an MCP client against the local data mart,
 including checks that a student outside the user's scope returns nothing. Set
 the `PG*` variables first; the tests use `TEST_USER_EMAIL`, or a Ridgemont High
-teacher by default.
+teacher by default. The sign-in tests get real tokens from the Keycloak in
+Docker: they need `DEMO_USER_PASSWORD` and, for the self-signed certificate,
+`NODE_EXTRA_CA_CERTS=certs/server.crt`. Without `DEMO_USER_PASSWORD` they are
+skipped.

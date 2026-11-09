@@ -4,6 +4,8 @@
   "enabled": true,
   "sslRequired": "external",
   "registrationAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
   "clients": [
     {
       "clientId": "edfi-mcp",

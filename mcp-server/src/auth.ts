@@ -82,11 +82,23 @@ export async function authenticate(req: IncomingMessage, config: AuthConfig): Pr
             currentDate: config.now?.(),
         });
         if (typeof payload.email !== 'string' || payload.email_verified !== true) {
+            console.error('Rejected a token: it has no verified email');
             return invalid('The token has no verified email');
         }
         return { ok: true, email: payload.email };
-    } catch {
-        // Don't echo the reason: it would help someone probing with forged tokens
+    } catch (error) {
+        // Log the reason (for example a wrong issuer or audience), but don't echo it: it would help someone
+        // probing with forged tokens
+        console.error(`Rejected a token: ${describe(error)}`);
         return invalid('The token is not valid for this server');
     }
+}
+
+/** A short reason for a failed token check, without the token itself. */
+function describe(error: unknown): string {
+    if (error instanceof Error) {
+        const code = (error as { code?: unknown }).code;
+        return typeof code === 'string' ? `${code}: ${error.message}` : error.message;
+    }
+    return String(error);
 }

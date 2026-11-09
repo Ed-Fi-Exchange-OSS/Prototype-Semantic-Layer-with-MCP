@@ -11,6 +11,10 @@
 
 set -euo pipefail
 
+# The passwords are optional in Compose, so the data mart builds without them; sign-in needs both
+[ -n "${KC_BOOTSTRAP_ADMIN_PASSWORD:-}" ] || { echo "Set KEYCLOAK_ADMIN_PASSWORD in datamart/.env" >&2; exit 1; }
+[ -n "${DEMO_USER_PASSWORD:-}" ] || { echo "Set DEMO_USER_PASSWORD in datamart/.env" >&2; exit 1; }
+
 kcadm=/opt/keycloak/bin/kcadm.sh
 server=http://keycloak:8080
 
