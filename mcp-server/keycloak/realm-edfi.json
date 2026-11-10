@@ -1,0 +1,66 @@
+{
+  "realm": "edfi",
+  "displayName": "Ed-Fi (early warning demo)",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "clients": [
+    {
+      "clientId": "edfi-mcp",
+      "name": "Early warning MCP server: AI assistants",
+      "description": "Public client for MCP clients (Claude Code, VS Code). Authorization code with PKCE.",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:33418/*",
+        "http://127.0.0.1:33418/*",
+        "http://localhost:33419/*",
+        "http://127.0.0.1:33419/*",
+        "https://vscode.dev/redirect"
+      ],
+      "webOrigins": ["+"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "MCP server audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "https://localhost:3000/mcp",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "edfi-mcp-tests",
+      "name": "Early warning MCP server: automated tests",
+      "description": "Public client for local automated tests only (password grant). Never use outside the demo.",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "MCP server audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "https://localhost:3000/mcp",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,8 @@
 
 # PostgreSQL server for the sample ODS and the data mart, and the MCP server (profile "mcp"). Set the
 # passwords in a .env file next to this file (see .env.example).
+# Every port is published on 127.0.0.1 only: the demo is meant to be used from this machine, not from
+# others on the same network.
 services:
   db:
     image: postgres:16-alpine
@@ -12,7 +14,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       MCP_READER_PASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
     ports:
-      - "${DATAMART_DB_PORT:-5440}:5432"
+      - "127.0.0.1:${DATAMART_DB_PORT:-5440}:5432"
     volumes:
       - datamart-db:/var/lib/postgresql/data
       - ./sql:/sql:ro
@@ -46,18 +48,76 @@ services:
       PGDATABASE: edfi_datamart
       PGUSER: mcp_reader
       PGPASSWORD: ${MCP_READER_PASSWORD:?Set MCP_READER_PASSWORD in .env}
+      # Sign-in through Keycloak; set OAUTH_ISSUER to empty in .env to use the demo user instead.
+      # The issuer and the resource URL must match realm-edfi.json, so the ports are fixed.
+      OAUTH_ISSUER: ${OAUTH_ISSUER-https://localhost:8443/realms/edfi}
+      OAUTH_JWKS_URL: http://keycloak:8080/realms/edfi/protocol/openid-connect/certs
+      MCP_RESOURCE_URL: https://localhost:3000/mcp
       DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-tina.blevins@RidgemontHighSchool.edu}
       TLS_CERT_FILE: /certs/server.crt
       TLS_KEY_FILE: /certs/server.key
     volumes:
       - ../mcp-server/certs:/certs:ro
     ports:
-      - "${MCP_PORT:-3000}:3000"
+      - "127.0.0.1:3000:3000"
     depends_on:
       db:
         condition: service_healthy
       mcp-cert:
         condition: service_completed_successfully
+      keycloak:
+        condition: service_started
+
+  # Sign-in for the MCP server: Keycloak with an "edfi" realm like Ed-Fi Admin App's, on
+  # https://localhost:8443 (same self-signed certificate). Port 8080 (plain HTTP) is only reachable inside the
+  # Docker network.
+  keycloak:
+    profiles: [mcp]
+    image: quay.io/keycloak/keycloak:26.1.5
+    # The passwords are checked here rather than with ":?", which Compose applies to every service, so the
+    # data mart builds without them.
+    entrypoint:
+      - bash
+      - -c
+      - >-
+        [ -n "$$KC_BOOTSTRAP_ADMIN_PASSWORD" ]
+        || { echo "Set KEYCLOAK_ADMIN_PASSWORD in datamart/.env" >&2; exit 1; };
+        exec /opt/keycloak/bin/kc.sh "$$@"
+      - kc.sh
+    command:
+      - start-dev
+      - --import-realm
+      - --hostname=https://localhost:8443
+      - --hostname-backchannel-dynamic=true
+      - --https-port=8443
+      - --https-certificate-file=/certs/server.crt
+      - --https-certificate-key-file=/certs/server.key
+      - --http-enabled=true
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-}
+    volumes:
+      - ../mcp-server/certs:/certs:ro
+      - ../mcp-server/keycloak/realm-edfi.json:/opt/keycloak/data/import/realm-edfi.json:ro
+    ports:
+      - "127.0.0.1:8443:8443"
+    depends_on:
+      mcp-cert:
+        condition: service_completed_successfully
+
+  # Creates the demo users (a teacher, a principal, the superintendent) once Keycloak is up.
+  keycloak-users:
+    profiles: [mcp]
+    image: quay.io/keycloak/keycloak:26.1.5
+    entrypoint: ["bash", "/scripts/create-demo-users.sh"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-}
+    volumes:
+      - ../mcp-server/keycloak/create-demo-users.sh:/scripts/create-demo-users.sh:ro
+    depends_on:
+      - keycloak
 
 volumes:
   datamart-db:

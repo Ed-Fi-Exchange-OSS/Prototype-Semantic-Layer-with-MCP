@@ -1,0 +1,6 @@
+discovered authorization server: https://localhost:8443/realms/edfi
+callback: code received | state ok true
+token exchange 200 access token received
+claims {"iss":"https://localhost:8443/realms/edfi","aud":["https://localhost:3000/mcp","account"],"azp":"edfi-mcp","email":"tina.blevins@ridgemonthighschool.edu","email_verified":true}
+MCP call as the signed-in user: at-risk Clark Vernon(4), Cathleen Coates(3), Erika Sadler(3)
+scope {"email":"tina.blevins@RidgemontHighSchool.edu","scopes":[{"scope":"Section","school":"Ridgemont High School"}],"sections":4,"students":716,"as_of":"2
