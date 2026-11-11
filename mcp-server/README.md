@@ -58,9 +58,11 @@ effect with sign-in on. What the user sees follows their role:
 
 - a teacher, the students in their sections (for example
   `tina.blevins@RidgemontHighSchool.edu`);
-- a principal, the students of their school (for example
-  `carmen.helms@RidgemontHighSchool.edu`);
-- the superintendent, the whole district (`superintendent@NorthridgeISD.edu`).
+- a principal or assistant principal, the students of their school (for example
+  `carmen.helms@RidgemontHighSchool.edu` or
+  `sheryl.horton@RidgemontHighSchool.edu`);
+- the superintendent or the district administrator, the whole district
+  (`superintendent@NorthridgeISD.edu`, `sysadmin@NorthridgeISD.edu`).
 
 ```sql
 SELECT u.useremail, a.userscope
@@ -74,10 +76,8 @@ LIMIT 10;
 The certificate is self-signed, so each client has to trust it. Clients sign
 in through Keycloak with the pre-registered client ID `edfi-mcp`: on the first
 request the server answers `401` and points them to Keycloak, and they open a
-browser to sign in. The demo users are `tina.blevins@RidgemontHighSchool.edu`
-(a teacher), `carmen.helms@RidgemontHighSchool.edu` (a principal) and
-`superintendent@NorthridgeISD.edu`, with the password set in
-`DEMO_USER_PASSWORD` in `datamart/.env`.
+browser to sign in. The demo users, one for each role above, all have the
+password set in `DEMO_USER_PASSWORD` in `datamart/.env`.
 
 Claude Code and the GitHub Copilot CLI run on Node.js: point
 `NODE_EXTRA_CA_CERTS` to the certificate before starting them, for example from

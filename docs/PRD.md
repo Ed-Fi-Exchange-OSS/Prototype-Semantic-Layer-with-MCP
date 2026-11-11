@@ -169,7 +169,8 @@ Ed-Fi ODS (Northridge sample data)
 - **FR-AUTH-2:** Signed-in users SHALL be linked to Ed-Fi staff records, and
   through them to their roles, by email address.
 - **FR-AUTH-3:** Access SHALL follow the role: a teacher sees their sections'
-  students; a principal, their school; a superintendent, their district.
+  students; a principal or assistant principal, their school; a superintendent
+  or district administrator, their district.
 - **FR-AUTH-4:** An MCP client SHALL be able to find where users sign in from
   the MCP server itself, and a request without a valid token SHALL get no
   data.
@@ -284,9 +285,6 @@ The implementation decisions are recorded as architecture decision records in
 
 ### Known limitations of the sample data
 
-- The sample data maps teachers, principals and the superintendent to an
-  access scope; assistant principals and the district administrator have none,
-  so they see no students.
 - Northridge doesn't link students to discipline incidents, so behavior comes
   from discipline actions, which do name the student. Incident details (what
   happened, where) aren't available per student.

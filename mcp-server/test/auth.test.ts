@@ -23,7 +23,9 @@ const resource = 'https://localhost:3000/mcp';
 const password = process.env.DEMO_USER_PASSWORD;
 const teacher = 'tina.blevins@RidgemontHighSchool.edu';
 const principal = 'carmen.helms@RidgemontHighSchool.edu';
+const assistantPrincipal = 'sheryl.horton@RidgemontHighSchool.edu';
 const superintendent = 'superintendent@NorthridgeISD.edu';
+const districtAdministrator = 'sysadmin@NorthridgeISD.edu';
 
 async function token(username: string, clientId = 'edfi-mcp-tests'): Promise<string> {
     const response = await fetch(`${issuer}/protocol/openid-connect/token`, {
@@ -142,9 +144,16 @@ describe('sign-in', { skip: password ? false : 'DEMO_USER_PASSWORD is not set' }
     });
 
     test('each signed-in user sees their own scope', async () => {
-        const expected: [string, string, number][] = [
-            [teacher, 'Section', 716], [principal, 'School', 3174], [superintendent, 'District', 21194]];
-        for (const [email, scopeName, students] of expected) {
+        const expected: [string, string][] = [
+            [teacher, 'Section'], [principal, 'School'], [assistantPrincipal, 'School'],
+            [superintendent, 'District'], [districtAdministrator, 'District'],
+        ];
+        for (const [email, scopeName] of expected) {
+            const [{ students }] = (await pool.query(
+                `SELECT count(*)::int AS students FROM analytics.rls_userstudentdataauthorization a
+                 JOIN analytics.rls_userdim u ON u.userkey = a.userkey
+                 WHERE lower(u.useremail) = lower($1)`, [email])).rows;
+            assert.ok(students > 0, email);
             const client = await connect(await token(email));
             const scope = await scopeOf(client);
             assert.equal(scope.email.toLowerCase(), email.toLowerCase());
