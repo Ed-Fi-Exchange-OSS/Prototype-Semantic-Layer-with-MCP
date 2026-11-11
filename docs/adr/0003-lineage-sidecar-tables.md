@@ -93,7 +93,8 @@ CREATE TABLE lineage.ods_record (
     event_date         date,                     -- when it happened, if it has a date
     summary            text NOT NULL,            -- e.g. 'Unexcused Absence, World History'
     recorded_at        timestamptz NOT NULL DEFAULT now(),
-    PRIMARY KEY (ods_resource, ods_id)
+    PRIMARY KEY (ods_resource, ods_id),
+    UNIQUE (ods_resource, ods_id, student_key)
 );
 
 -- Every modification of an ODS record: which application, and when (option 2)
@@ -114,9 +115,18 @@ CREATE TABLE lineage.indicator_evidence (
     ods_resource       text NOT NULL,
     ods_id             uuid NOT NULL,
     PRIMARY KEY (student_key, indicator, ods_resource, ods_id),
-    FOREIGN KEY (ods_resource, ods_id) REFERENCES lineage.ods_record
+    FOREIGN KEY (ods_resource, ods_id, student_key)
+        REFERENCES lineage.ods_record (ods_resource, ods_id, student_key)
 );
 ```
+
+`student_key` is the student's `studentUniqueId`: the same value, from the same
+ODS column, as `studentkey` in the data mart, including
+`rls_userstudentdataauthorization`. Tools that read lineage join that access
+mapping on `studentkey = student_key`, so they keep ADR 0001's rule that every
+tool joins the access mapping. Each evidence record belongs to one student, and
+the foreign key includes `student_key`, so `ods_record` and
+`indicator_evidence` can't name different students for the same record.
 
 The link is by indicator, not by fact row: the question an educator asks is
 "why is this student flagged for attendance?", and the answer is a list of
