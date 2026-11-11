@@ -52,8 +52,24 @@ CREATE TABLE IF NOT EXISTS lineage.indicator_evidence (
         CHECK (indicator IN ('attendance', 'course_performance', 'assessments', 'behavior')),
     ods_resource       text NOT NULL,
     ods_id             uuid NOT NULL,
-    PRIMARY KEY (student_key, indicator, ods_resource, ods_id),
-    FOREIGN KEY (ods_resource, ods_id) REFERENCES lineage.ods_record
+    PRIMARY KEY (student_key, indicator, ods_resource, ods_id)
 );
 
 CREATE INDEX IF NOT EXISTS ix_ods_record_student ON lineage.ods_record (student_key);
+
+-- The evidence names the same student as its ODS record: the foreign key includes student_key. Earlier versions
+-- referenced the record without the student.
+ALTER TABLE lineage.indicator_evidence DROP CONSTRAINT IF EXISTS indicator_evidence_ods_resource_ods_id_fkey;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ods_record_student_key') THEN
+        ALTER TABLE lineage.ods_record
+            ADD CONSTRAINT ods_record_student_key UNIQUE (ods_resource, ods_id, student_key);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'indicator_evidence_ods_record_fkey') THEN
+        ALTER TABLE lineage.indicator_evidence
+            ADD CONSTRAINT indicator_evidence_ods_record_fkey FOREIGN KEY (ods_resource, ods_id, student_key)
+            REFERENCES lineage.ods_record (ods_resource, ods_id, student_key);
+    END IF;
+END
+$$;
