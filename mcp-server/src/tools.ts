@@ -86,10 +86,11 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
     server.registerTool('list_students_at_risk', {
         title: 'Students at risk',
         description: 'Lists the students the signed-in educator may see who meet at least one early warning '
-            + 'indicator: absent from any class on at least absence_threshold percent of instructional days '
-            + 'so far, a grade below passing_grade in the latest grading period, a Fail or Well Below Basic '
+            + 'indicator: absent from at least one class on at least absence_threshold percent of '
+            + 'instructional days so far, a grade below passing_grade in the latest grading period, a Fail or Well Below Basic '
             + 'assessment result, or at least discipline_threshold discipline actions (removal from class, '
-            + 'suspension, expulsion) so far. Sorted by the number of indicators, then by absence rate.',
+            + 'suspension, expulsion) so far. Sorted by the number of indicators, then by absence rate. '
+            + '"evidence" lists the indicators whose records get_indicator_evidence can show.',
         inputSchema: {
             section: key.optional().describe('Only students in this section (key from list_my_sections)'),
             absence_threshold: z.number().min(1).max(100).optional()
@@ -117,13 +118,15 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
             students: rows,
             truncated,
         }, ['ews_studentearlywarningfact', 'ews_studentsectiongradefact', 'gradingperioddim',
-            'asmt_studentassessmentfact', 'equity_studentdisciplineactiondim', 'studentschooldim']);
+            'asmt_studentassessmentfact', 'equity_studentdisciplineactiondim', 'studentschooldim',
+            'lineage.indicator_evidence']);
     }));
 
     server.registerTool('get_student_summary', {
         title: 'Student summary',
         description: 'Summarizes one student the signed-in educator may see: attendance so far, grades in '
-            + 'the latest grading period, assessment results, discipline actions and programs.',
+            + 'the latest grading period, assessment results, discipline actions and programs. "evidence" '
+            + 'lists the indicators whose records get_indicator_evidence can show.',
         inputSchema: { student: key.describe('Student key from find_students or list_students_at_risk') },
         annotations: readOnly,
     }, args => withUser(async user => {
@@ -135,7 +138,48 @@ export function registerTools(server: McpServer, currentUser: UserResolver): voi
         return result(row.summary, ['studentschooldim', 'ews_studentearlywarningfact',
             'ews_studentsectiongradefact', 'gradingperioddim', 'studentsectiondim',
             'asmt_studentassessmentfact', 'asmt_assessmentfact', 'equity_studentdisciplineactiondim',
-            'studentprogramdim']);
+            'studentprogramdim', 'lineage.indicator_evidence']);
+    }));
+
+    server.registerTool('get_indicator_evidence', {
+        title: 'Indicator evidence',
+        description: 'Shows the records behind one early warning indicator for one student the signed-in '
+            + 'educator may see: the absences, the grades below passing, the low assessment results or the '
+            + 'discipline actions, each with its Ed-Fi ODS resource and id, and "_lineage": every change to '
+            + 'the record, oldest first, with the application that made it and the time (Unix seconds), as '
+            + 'in the Ed-Fi lineage proposal. Attendance has one record per class missed: "days" is the '
+            + 'number of different days, the same as days_absent (days absent from at least one class). '
+            + 'Lineage covers a demonstration set of students; the "evidence" field of '
+            + 'list_students_at_risk and get_student_summary says which indicators have records. The '
+            + 'applications and their changes in the demonstration are fictional samples.',
+        inputSchema: {
+            student: key.describe('Student key from find_students or list_students_at_risk'),
+            indicator: z.enum(['attendance', 'course_performance', 'assessments', 'behavior'])
+                .describe('The early warning indicator'),
+            limit,
+        },
+        annotations: readOnly,
+    }, args => withUser(async user => {
+        const max = args.limit ?? DEFAULT_LIMIT;
+        const [row] = await query<{ evidence: { total: number; days: number; records: unknown[] } }>(
+            'indicator-evidence', [user, args.student, args.indicator, max]);
+        if (!row) {
+            return message(`No student ${args.student} among the students you may see.`);
+        }
+        const { total, days, records } = row.evidence;
+        return result({
+            student: args.student,
+            indicator: args.indicator,
+            total,
+            days,
+            records,
+            truncated: total > records.length,
+            ...(total === 0 && {
+                note: 'No lineage records for this student and indicator. Lineage covers a demonstration '
+                    + 'set of students only, so this does not mean the indicator has no underlying records.',
+            }),
+        }, ['lineage.indicator_evidence', 'lineage.ods_record', 'lineage.ods_record_change', 'lineage.application',
+            'rls_userstudentdataauthorization']);
     }));
 
     server.registerTool('get_attendance_trend', {

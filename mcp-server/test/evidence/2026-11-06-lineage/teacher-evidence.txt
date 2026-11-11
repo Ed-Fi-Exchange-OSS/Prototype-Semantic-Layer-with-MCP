@@ -1,0 +1,205 @@
+Signed in as tina.blevins@RidgemontHighSchool.edu; server https://localhost:3000/mcp
+Tools: find_students, get_attendance_trend, get_indicator_evidence, get_my_scope, get_student_summary, list_my_sections, list_students_at_risk
+
+list_students_at_risk, student 004688: {"indicators":4,"evidence":["assessments","attendance","behavior","course_performance"]}
+
+> get_indicator_evidence {"student":"004688","indicator":"attendance","limit":2}
+{
+  "student": "004688",
+  "indicator": "attendance",
+  "total": 51,
+  "days": 44,
+  "records": [
+    {
+      "date": "2026-11-06",
+      "summary": "Unexcused Absence, W-HIST",
+      "ods_resource": "studentSectionAttendanceEvents",
+      "ods_id": "85be1301-13ab-47d8-8623-89efb2250c5b",
+      "natural_key": {
+        "schoolId": 255901002,
+        "eventDate": "2026-11-06",
+        "schoolYear": 2027,
+        "sessionName": "2026 - 2027 Fall Semester",
+        "localCourseCode": "W-HIST",
+        "studentUniqueId": "004688",
+        "sectionIdentifier": "255901002_08-Traditional_WHIST_138_20262027",
+        "attendanceEventCategory": "Unexcused Absence"
+      },
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1793981760
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "summary": "Unexcused Absence, W-HIST",
+      "ods_resource": "studentSectionAttendanceEvents",
+      "ods_id": "fff4ecf1-4c91-4923-892b-a4ec49cb02f4",
+      "natural_key": {
+        "schoolId": 255901002,
+        "eventDate": "2026-11-05",
+        "schoolYear": 2027,
+        "sessionName": "2026 - 2027 Fall Semester",
+        "localCourseCode": "W-HIST",
+        "studentUniqueId": "004688",
+        "sectionIdentifier": "255901002_08-Traditional_WHIST_138_20262027",
+        "attendanceEventCategory": "Unexcused Absence"
+      },
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1793897160
+        }
+      ]
+    }
+  ],
+  "truncated": true,
+  "as_of": "2026-11-06",
+  "sources": [
+    "lineage.indicator_evidence",
+    "lineage.ods_record",
+    "lineage.ods_record_change",
+    "lineage.application",
+    "rls_userstudentdataauthorization"
+  ]
+}
+
+> get_indicator_evidence {"student":"004688","indicator":"course_performance","limit":2}
+{
+  "student": "004688",
+  "indicator": "course_performance",
+  "total": 8,
+  "days": 1,
+  "records": [
+    {
+      "date": "2026-10-05",
+      "summary": "Grade 49 (F), ART-2, Second Six Weeks",
+      "ods_resource": "grades",
+      "ods_id": "169c4dbc-819a-4745-8ec0-a875a5b70692",
+      "natural_key": {
+        "schoolId": 255901002,
+        "gradeType": "Grading Period",
+        "schoolYear": 2027,
+        "sessionName": "2026 - 2027 Fall Semester",
+        "gradingPeriod": "Second Six Weeks",
+        "localCourseCode": "ART-2",
+        "studentUniqueId": "004688",
+        "gradingPeriodName": "Grading Period A",
+        "sectionIdentifier": "255901002_01-Traditional_ART2_103_20262027"
+      },
+      "_lineage": [
+        {
+          "applicationName": "Northridge Gradebook (fictional sample)",
+          "timestamp": 1791217380
+        }
+      ]
+    },
+    {
+      "date": "2026-10-05",
+      "summary": "Grade 42 (F), PE-10, Second Six Weeks",
+      "ods_resource": "grades",
+      "ods_id": "1ba42bb9-96a3-4a18-91d7-dbcba69de3c6",
+      "natural_key": {
+        "schoolId": 255901002,
+        "gradeType": "Grading Period",
+        "schoolYear": 2027,
+        "sessionName": "2026 - 2027 Fall Semester",
+        "gradingPeriod": "Second Six Weeks",
+        "localCourseCode": "PE-10",
+        "studentUniqueId": "004688",
+        "gradingPeriodName": "Grading Period A",
+        "sectionIdentifier": "255901002_06-Traditional_PE10_124_20262027"
+      },
+      "_lineage": [
+        {
+          "applicationName": "Northridge Gradebook (fictional sample)",
+          "timestamp": 1791211440
+        }
+      ]
+    }
+  ],
+  "truncated": true,
+  "as_of": "2026-11-06",
+  "sources": [
+    "lineage.indicator_evidence",
+    "lineage.ods_record",
+    "lineage.ods_record_change",
+    "lineage.application",
+    "rls_userstudentdataauthorization"
+  ]
+}
+
+> get_indicator_evidence {"student":"004688","indicator":"assessments","limit":2}
+{
+  "student": "004688",
+  "indicator": "assessments",
+  "total": 1,
+  "days": 1,
+  "records": [
+    {
+      "date": "2026-09-02",
+      "summary": "STATE Algebra II: Well Below Basic",
+      "ods_resource": "studentAssessments",
+      "ods_id": "2df40df6-a5a6-4277-b63f-3ab6cc58a2ac",
+      "natural_key": {
+        "namespace": "uri://ed-fi.org/Assessment",
+        "studentUniqueId": "004688",
+        "assessmentIdentifier": "STATE Algebra II",
+        "studentAssessmentIdentifier": "STATE Algebra II_2017-08-30"
+      },
+      "_lineage": [
+        {
+          "applicationName": "State Assessment Vendor (fictional sample)",
+          "timestamp": 1788975120
+        }
+      ]
+    }
+  ],
+  "truncated": false,
+  "as_of": "2026-11-06",
+  "sources": [
+    "lineage.indicator_evidence",
+    "lineage.ods_record",
+    "lineage.ods_record_change",
+    "lineage.application",
+    "rls_userstudentdataauthorization"
+  ]
+}
+
+> get_indicator_evidence {"student":"004688","indicator":"behavior","limit":2}
+{
+  "student": "004688",
+  "indicator": "behavior",
+  "total": 1,
+  "days": 1,
+  "records": [
+    {
+      "date": "2026-08-25",
+      "summary": "In School Suspension",
+      "ods_resource": "disciplineActions",
+      "ods_id": "4ca234bb-f8ae-42d0-bc72-e3042794043e",
+      "natural_key": {
+        "disciplineDate": "2026-08-25",
+        "studentUniqueId": "004688",
+        "disciplineActionIdentifier": "432"
+      },
+      "_lineage": [
+        {
+          "applicationName": "Northridge SIS (fictional sample)",
+          "timestamp": 1787667660
+        }
+      ]
+    }
+  ],
+  "truncated": false,
+  "as_of": "2026-11-06",
+  "sources": [
+    "lineage.indicator_evidence",
+    "lineage.ods_record",
+    "lineage.ods_record_change",
+    "lineage.application",
+    "rls_userstudentdataauthorization"
+  ]
+}
