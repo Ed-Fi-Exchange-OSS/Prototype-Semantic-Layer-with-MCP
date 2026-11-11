@@ -66,7 +66,8 @@ decisions, for example how lineage sidecar tables are populated and read.
   it without changing the tools.
 - **Read-only access.** The server connects as `mcp_reader`, a role that can
   only read the `analytics` schema of the data mart and has no access to the
-  ODS; its sessions are also read-only.
+  ODS; its sessions are also read-only. [ADR 0003](0003-lineage-sidecar-tables.md)
+  extends this to read the `lineage` schema.
 - **Compact, traceable results.** Results are JSON with the fields a person
   would read, row caps (default 25, maximum 100) with a `truncated` flag, the
   as-of date and the data mart tables used. Lineage can add source

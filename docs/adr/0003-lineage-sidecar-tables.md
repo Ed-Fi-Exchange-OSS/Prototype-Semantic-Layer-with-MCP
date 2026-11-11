@@ -52,8 +52,26 @@ the next phase (DEVOPS-187).
 ### Lineage lives in its own schema
 
 The tables live in a `lineage` schema in the data mart database. The data mart
-build replaces only the `analytics` schema, so lineage records survive a
-refresh. The MCP server's role can read them.
+build owns them. On a full build and on a refresh, after it rebuilds the
+`analytics` tables (and, on a full build, after it moves the ODS dates to the
+current school year), it creates the `lineage` tables if they don't exist and
+reruns the population script. The
+script replaces the demonstration rows, so their dates, natural keys and
+summaries match the facts after every build. Rebuilding `analytics` doesn't
+touch the `lineage` schema; if the data mart database itself is dropped, the
+next build recreates the lineage with it.
+
+The ODS `id`s stay the same from one build to the next only because they come
+from the Northridge backup, which every full build restores. Moving the dates
+changes dates, not `id`s.
+
+### Read access
+
+The MCP server's role, `mcp_reader`, gets `USAGE` on the `lineage` schema and
+`SELECT` on its tables, in the same script that grants `analytics`. It gets no
+write access: the build fills the tables as the database owner, and
+`mcp_reader` sessions stay read-only. This amends ADR 0001, which limited
+`mcp_reader` to the `analytics` schema.
 
 ### Four tables
 
@@ -166,8 +184,9 @@ a later improvement.
 
 ## Consequences
 
-- Lineage survives data mart refreshes, but can go stale if the ODS records
-  behind it change; the demonstration script can be rerun.
+- The demonstration lineage is rebuilt with the data mart, so it matches the
+  facts after every build. Between builds it can go stale if the ODS records
+  behind it change.
 - Students outside the demonstration set have no evidence yet; tools say so
   rather than inventing it.
 - The applications and their changes in the demonstration are fictional; the
