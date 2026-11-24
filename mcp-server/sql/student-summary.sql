@@ -4,7 +4,8 @@
 -- See the LICENSE and NOTICES files in the project root for more information.
 
 -- One student's attendance so far, grades in the latest grading period, assessment results and discipline
--- actions up to today, and programs. No row when the user may not see the student.
+-- actions up to today, programs, and the indicators that have lineage records (docs/adr/0003). No row when
+-- the user may not see the student.
 -- $1: user key, $2: student key.
 
 WITH latest_period AS (
@@ -74,7 +75,11 @@ SELECT json_build_object(
     'programs', (
         SELECT json_agg(DISTINCT p.programname)
         FROM analytics.studentprogramdim p
-        WHERE p.studentkey = $2)
+        WHERE p.studentkey = $2),
+    'evidence', (
+        SELECT coalesce(json_agg(DISTINCT e.indicator), '[]'::json)
+        FROM lineage.indicator_evidence e
+        WHERE e.student_key = $2)
 ) AS summary
 WHERE EXISTS (
     SELECT 1 FROM analytics.rls_userstudentdataauthorization

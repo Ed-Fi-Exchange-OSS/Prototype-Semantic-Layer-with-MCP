@@ -1,0 +1,16 @@
+Signed in as carmen.helms@RidgemontHighSchool.edu; server https://localhost:3000/mcp
+Tools: find_students, get_attendance_trend, get_indicator_evidence, get_my_scope, get_student_summary, list_my_sections, list_students_at_risk
+
+list_students_at_risk, student 000001: "not in the list"
+
+> get_indicator_evidence {"student":"000001","indicator":"attendance","limit":2} (error)
+No student 000001 among the students you may see.
+
+> get_indicator_evidence {"student":"000001","indicator":"course_performance","limit":2} (error)
+No student 000001 among the students you may see.
+
+> get_indicator_evidence {"student":"000001","indicator":"assessments","limit":2} (error)
+No student 000001 among the students you may see.
+
+> get_indicator_evidence {"student":"000001","indicator":"behavior","limit":2} (error)
+No student 000001 among the students you may see.

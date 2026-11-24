@@ -8,6 +8,7 @@
 --   course performance: a numeric grade below $4 in the latest grading period that has started;
 --   assessments: a Fail or Well Below Basic result up to today;
 --   behavior: at least $5 discipline actions (removal from class, suspension, expulsion) so far.
+-- evidence lists the indicators that have lineage records (docs/adr/0003), for get_indicator_evidence.
 -- $1: user key, $2: section key (optional), $3: absence threshold (percent), $4: passing grade,
 -- $5: discipline actions, $6: row limit.
 
@@ -87,7 +88,9 @@ SELECT f.studentkey AS key,
        (CASE WHEN f.absence_rate >= $3 THEN 1 ELSE 0 END
         + CASE WHEN f.failing_grades > 0 THEN 1 ELSE 0 END
         + CASE WHEN f.low_assessments > 0 THEN 1 ELSE 0 END
-        + CASE WHEN f.discipline_actions >= $5 THEN 1 ELSE 0 END) AS indicators
+        + CASE WHEN f.discipline_actions >= $5 THEN 1 ELSE 0 END) AS indicators,
+       ARRAY(SELECT DISTINCT e.indicator FROM lineage.indicator_evidence e
+             WHERE e.student_key = f.studentkey ORDER BY e.indicator) AS evidence
 FROM flags f
 JOIN LATERAL (
     SELECT studentfirstname || ' ' || studentlastname AS name, gradelevel AS grade_level

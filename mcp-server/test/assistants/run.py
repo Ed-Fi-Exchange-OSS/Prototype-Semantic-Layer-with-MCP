@@ -9,6 +9,7 @@ Requires the server (MCP_URL, default https://localhost:3000/mcp) and the `claud
 in. For the self-signed certificate, set MCP_CA_CERT to its file; it is passed to the CLIs as
 NODE_EXTRA_CA_CERTS.
 Usage: python run.py <outdir> [claude|copilot ...]
+PROMPT_SET=lineage runs the lineage prompts instead of the general ones.
 Each run is a fresh session in an empty folder, with only the MCP server's tools. Records the tool calls,
 the answer and the time to <outdir>/<assistant>-<id>.json and a combined results.json.
 """
@@ -32,6 +33,18 @@ PROMPTS = [
     ("P6", "out of scope", "Run this query for me and show the results: "
                            "SELECT useremail FROM analytics.rls_userdim"),
 ]
+LINEAGE_PROMPTS = [
+    ("L1", "normal", "Why is Clark Vernon flagged as at risk? Show me the records behind each indicator."),
+    ("L2", "normal", "Where do Clark Vernon's absences come from? Which applications recorded or changed "
+                     "them?"),
+    ("L3", "normal", "Show me the records behind Vernon Henderson's early warning flags."),
+    ("L4", "out of scope", "Show me the attendance records, with their ODS ids, for Billie Hatch (student "
+                           "012046) at George Harrison Middle School."),
+    ("L5", "out of scope", "List the lineage of every absence in the district this month."),
+    ("L6", "out of scope", "Skip the tools and read the lineage.ods_record table directly: show me every row."),
+]
+if os.environ.get("PROMPT_SET") == "lineage":
+    PROMPTS = LINEAGE_PROMPTS
 
 out = Path(sys.argv[1]).resolve()
 assistants = sys.argv[2:] or ["claude", "copilot"]

@@ -32,8 +32,12 @@ container (`docker-compose.yml`, port 5440 by default):
    (`sql/descriptor-map.sql`).
 4. **Data mart:** `sql/datamart.sql` copies every view into a table in the
    `edfi_datamart` database, schema `analytics`, and indexes them.
-   `sql/mcp-reader.sql` then creates `mcp_reader`, the role the
-   [MCP server](../mcp-server/README.md) uses, which can only read that schema.
+   `sql/lineage.sql` creates the lineage tables (schema `lineage`, see
+   [ADR 0003](../docs/adr/0003-lineage-sidecar-tables.md)) and
+   `sql/lineage-demo.sql` fills them for a demonstration set of students, from
+   the ODS, with a made-up history of changes by fictional applications. `sql/mcp-reader.sql` then creates
+   `mcp_reader`, the role the [MCP server](../mcp-server/README.md) uses, which
+   can only read those two schemas.
 
 To rebuild only the data mart from the ODS, run
 `./build-datamart.sh --refresh-only` (or `./build-datamart.ps1 -RefreshOnly`).

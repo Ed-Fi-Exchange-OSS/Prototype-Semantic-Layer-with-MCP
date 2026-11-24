@@ -13,8 +13,9 @@
     2. Moves its dates to the current school year (sql/time-travel.sql).
     3. Installs the analytics views (sql/views) and their Northridge configuration
        (sql/descriptor-map.sql).
-    4. Builds the data mart database, with the views materialized into tables (sql/datamart.sql), and the
-       read-only role the MCP server uses (sql/mcp-reader.sql).
+    4. Builds the data mart database, with the views materialized into tables (sql/datamart.sql), the
+       lineage tables with a demonstration set (sql/lineage.sql, sql/lineage-demo.sql), and the read-only
+       role the MCP server uses (sql/mcp-reader.sql).
 
 .PARAMETER RefreshOnly
     Only rebuilds the data mart from the ODS (step 4).
@@ -83,6 +84,7 @@ Invoke-Db ("psql -U postgres -tc `"SELECT 1 FROM pg_database WHERE datname = '$D
 # The password comes from the container's environment, so it never appears in a command line here.
 Invoke-Db ("psql -U postgres -d $DataMartDb -q -v ods_db=$OdsDb -v ods_user=postgres " +
     "-v ods_password=`"`$POSTGRES_PASSWORD`" -f /sql/datamart.sql")
+Invoke-Db "psql -U postgres -d $DataMartDb -q -v ON_ERROR_STOP=1 -f /sql/lineage.sql -f /sql/lineage-demo.sql"
 Invoke-Db ("psql -U postgres -d $DataMartDb -q -v ON_ERROR_STOP=1 " +
     "-v reader_password=`"`$MCP_READER_PASSWORD`" -f /sql/mcp-reader.sql")
 

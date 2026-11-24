@@ -1,0 +1,52 @@
+{
+ "assistant": "claude",
+ "id": "L3",
+ "kind": "normal",
+ "prompt": "Show me the records behind Vernon Henderson's early warning flags.",
+ "model": "claude-sonnet-5-5",
+ "exit_code": 0,
+ "seconds": 15.5,
+ "tool_calls": [
+  {
+   "tool": "ToolSearch",
+   "arguments": {
+    "query": "select:mcp__early-warning__find_students,mcp__early-warning__get_indicator_evidence,mcp__early-warning__get_student_summary,mcp__early-warning__get_my_scope",
+    "max_results": 5
+   }
+  },
+  {
+   "tool": "mcp__early-warning__find_students",
+   "arguments": {
+    "name": "Vernon Henderson"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_student_summary",
+   "arguments": {
+    "student": "004729"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "attendance"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "course_performance"
+   }
+  },
+  {
+   "tool": "mcp__early-warning__get_indicator_evidence",
+   "arguments": {
+    "student": "004729",
+    "indicator": "assessments"
+   }
+  }
+ ],
+ "answer": "I couldn't pull record-level evidence for Vernon Henderson (Tenth grade, Ridgemont High School, key 004729). The evidence tool only has records, with their Ed-Fi ODS ids and change lineage, for a demonstration set of students, and he isn't in it. I checked attendance, course performance and assessments, and each returned zero records. The tool says this doesn't mean the underlying records don't exist. I didn't check behavior, because his summary shows no discipline actions.\n\nHis summary does show what sits behind the flags:\n\n**Attendance** (50 instructional days)\n- 5 days absent, a 10% absence rate.\n- 1 absence is excused and 4 are unexcused.\n- No tardies.\n\n**Course performance** (Second Six Weeks)\nHe is failing all 8 courses:\n\n| Course | Grade |\n|---|---|\n| Algebra II | 33 (F) |\n| Biology | 29 (F) |\n| Computer Lab, Grade 10 | 27 (F) |\n| Humanities | 31 (F) |\n| Intermediate Art | 32 (F) |\n| Languages Other Than English Level I | 26 (F) |\n| Physical Education, Grades 9-12 | 36 (F) |\n| World History Studies | 23 (F) |\n\n**Assessments**\n- STATE Algebra II on 2026-09-02: score 6, Well Below Basic.\n\n**Behavior and programs**\n- No discipline actions and no program enrollments are recorded.\n\nFailing every course at once is unusual. It could be real, but it could also be a data problem, such as grades not yet posted or a feed error. To check, the source records would have to come from the SIS or gradebook, outside this tool."
+}

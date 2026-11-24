@@ -24,9 +24,17 @@ Copilot, are in [TESTING.md](./TESTING.md).
 | `list_students_at_risk` | Students flagged by attendance, behavior (discipline actions), grades in the latest grading period or assessment results |
 | `get_student_summary` | One student's attendance, grades, assessments, discipline actions and programs |
 | `get_attendance_trend` | Absences per week for a student or a section |
+| `get_indicator_evidence` | The records behind one indicator for one student: each absence, grade, assessment result or discipline action, with its ODS resource and `id`, and its `_lineage`: the application and time of every change |
 
 Every tool is read-only and returns compact JSON with the date and the data
 mart tables it used.
+
+Lineage ([ADR 0003](../docs/adr/0003-lineage-sidecar-tables.md)) covers a
+demonstration set of six Ridgemont High students, filled when the data mart is
+built. `list_students_at_risk` and `get_student_summary` say in `evidence` which
+indicators have records. Each record's `_lineage` follows option 2 of the
+[Ed-Fi lineage proposal](https://github.com/Ed-Fi-Alliance-OSS/Ed-Fi-Technology-Roadmap/issues/20);
+the applications and their changes are fictional sample values.
 
 ## Run it
 
